@@ -232,7 +232,7 @@
     .hero-text {
       position: absolute;
       bottom: 22%;
-      right: 8%;
+      right: 6%;
       text-align: center;
     }
     .hero-text h1 {
@@ -591,10 +591,37 @@
 
     /* ─── MOBILE ─── */
     @media (max-width: 768px) {
+      /* Nav */
+      nav { padding: 1rem 1.2rem; }
+      .logo {
+        font-size: 1rem;
+        margin-left: 0;
+        letter-spacing: 0.15em;
+        /* fix vertical writing — ensure horizontal */
+        writing-mode: horizontal-tb;
+        text-orientation: mixed;
+      }
+      .nav-links-inline { padding-right: 1rem; gap: 1.2rem; }
+      .nav-links-inline a { font-size: 0.6rem; }
+
+      /* Hero text — center it on mobile */
+      .hero-text {
+        bottom: 12%;
+        right: auto;
+        left: 50%;
+        transform: translateX(-50%);
+        text-align: center;
+        width: 85%;
+      }
+      .hero-text p { max-width: 100%; }
+
+      /* Rocket — smaller, don't overflow */
+      .rocket-hero-wrap { width: 220px; }
+      .satellite-img { width: 160px; left: 160px; bottom: 120px; }
+
+      /* Other pages */
       .projects-hero { flex-direction: column; padding: 3rem 1.5rem; gap: 3rem; }
       .rocket-wrap { width: 130px; align-self: flex-end; }
-      .rocket-hero-wrap { width: 180px; }
-      nav { padding: 1rem 1.2rem; }
       .projects-specs { grid-template-columns: 1fr; }
       .about-body { grid-template-columns: 1fr; }
       .values-grid { grid-template-columns: 1fr 1fr; }
@@ -602,11 +629,14 @@
       .contact-info { border-right: none; border-bottom: 1px solid #1a1a1a; }
     }
     @media (max-width: 480px) {
-      .hero-text h1 { font-size: 1.5rem; }
-      .rocket-hero-wrap { width: 130px; }
+      .hero-text h1 { font-size: 1.4rem; }
+      .hero-text p { font-size: 0.55rem; }
+      .rocket-hero-wrap { width: 160px; }
+      .satellite-img { width: 120px; left: 110px; bottom: 90px; }
       .product-info h2 { font-size: 2rem; }
       .about-header h1, .contact-header h1 { font-size: 2.2rem; }
       .values-grid { grid-template-columns: 1fr; }
+      .prototype-inner h2 { font-size: 2.5rem; }
     }
     /* ─── PROTOTYPE SECTION — slides over the sticky hero ─── */
     .prototype-section {
@@ -743,7 +773,7 @@
     </div>
     <div class="hero-text">
       <h1>Live Soon</h1>
-      <p>Domain is under development Meanwhile for any query reach us at our contact page!</p>
+      <p>Domain is under development by our IT team. For any query reach us at our contact page!</p>
       <button class="btn-outline" onclick="showPage('contact')">Contact Us</button>
     </div>
     <button class="scroll-arrow" onclick="document.getElementById('proto-section').scrollIntoView({behavior:'smooth'})" aria-label="View Projects">&#8964;</button>
