@@ -3,10 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>velocity</title>
+  <title>QUNIX</title>
+  <!-- Inline SVG favicon — shows Q U N I X logo in browser tab -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%230a0a0a'/><text x='50' y='38' font-family='monospace' font-size='28' font-weight='bold' fill='%23c0532a' text-anchor='middle' dominant-baseline='middle'>QX</text><text x='50' y='68' font-family='monospace' font-size='10' letter-spacing='3' fill='%23c0532a' text-anchor='middle'>QUNIX</text></svg>">
+  <meta name="theme-color" content="#c0532a">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
       --black: #0a0a0a;
       --dark-gray: #2a2a2a;
@@ -14,988 +16,1297 @@
       --text-white: #f5f5f5;
       --text-muted: #aaa;
       --accent: #c0532a;
+      --proj-bg: #0d1117;
+      --proj-surface: #161b22;
+      --proj-border: #30363d;
+      --proj-accent: #58a6ff;
+      --proj-accent2: #3fb950;
+      --proj-text: #e6edf3;
+      --proj-muted: #8b949e;
     }
-
     html { scroll-behavior: smooth; }
-
-    body {
-      background: var(--black);
-      color: var(--text-white);
-      font-family: 'Courier New', Courier, monospace;
-      overflow-x: hidden;
-    }
-
-    /* ─── PAGE SYSTEM ─── */
+    body { background: var(--black); color: var(--text-white); font-family: 'Courier New', Courier, monospace; overflow-x: hidden; }
     .page { display: none; min-height: 100vh; }
     .page.active { display: block; }
 
-    /* ─── NAV ─── */
-    nav {
-      position: fixed; top: 0; left: 0; right: 0;
-      z-index: 100;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 1.4rem 2.5rem;
-      background: transparent;
-      transition: backdrop-filter 0.5s ease, -webkit-backdrop-filter 0.5s ease;
-    }
-    nav.scrolled {
-      backdrop-filter: blur(16px) saturate(1.4);
-      -webkit-backdrop-filter: blur(16px) saturate(1.4);
-    }
-    .logo {
-      font-size: 1.25rem;
-      letter-spacing: 0.25em;
-      color: var(--accent);
-      text-decoration: none;
-      font-weight: 700;
-      margin-left: 1.5rem;
-      padding-top: 0.6rem;
-      cursor: pointer;
-    }
-
-    /* ─── HAMBURGER → X morph ─── */
-    .hamburger {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 6px;
-      width: 28px;
-      height: 28px;
-      cursor: pointer;
-      background: none;
-      border: none;
-      padding: 0;
-      z-index: 300;
-      position: relative;
-      flex-shrink: 0;
-    }
-    .hamburger span {
-      display: block;
-      height: 1.5px;
-      background: var(--text-white);
-      border-radius: 2px;
-      transform-origin: center;
-      transition:
-        transform  0.55s cubic-bezier(0.76, 0, 0.24, 1),
-        opacity    0.35s cubic-bezier(0.76, 0, 0.24, 1),
-        width      0.55s cubic-bezier(0.76, 0, 0.24, 1),
-        background 0.3s ease;
-    }
+    /* NAV */
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 1.4rem 2.5rem; background: transparent; transition: backdrop-filter 0.5s ease, -webkit-backdrop-filter 0.5s ease; }
+    nav.scrolled { backdrop-filter: blur(16px) saturate(1.4); -webkit-backdrop-filter: blur(16px) saturate(1.4); }
+    .logo { font-size: 1.25rem; letter-spacing: 0.25em; color: var(--accent); font-weight: 700; margin-left: 1.5rem; padding-top: 0.6rem; cursor: pointer; white-space: nowrap; writing-mode: horizontal-tb; }
+    .hamburger { display: flex; flex-direction: column; justify-content: center; gap: 6px; width: 28px; height: 28px; cursor: pointer; background: none; border: none; padding: 0; z-index: 300; position: relative; flex-shrink: 0; }
+    .hamburger span { display: block; height: 1.5px; background: var(--text-white); border-radius: 2px; transform-origin: center; transition: transform 0.55s cubic-bezier(0.76,0,0.24,1), opacity 0.35s cubic-bezier(0.76,0,0.24,1), width 0.55s cubic-bezier(0.76,0,0.24,1), background 0.3s ease; }
     .hamburger span:nth-child(1) { width: 100%; }
     .hamburger span:nth-child(2) { width: 68%; animation: linePulse 2.5s ease-in-out infinite; }
     .hamburger span:nth-child(3) { width: 84%; }
-
-    @keyframes linePulse {
-      0%   { transform: scaleX(1); opacity: 1; }
-      50%  { transform: scaleX(0.6); opacity: 0.5; }
-      100% { transform: scaleX(1); opacity: 1; }
-    }
-
+    @keyframes linePulse { 0%, 100% { transform: scaleX(1); opacity: 1; } 50% { transform: scaleX(0.6); opacity: 0.5; } }
     .hamburger:not(.open):hover span { width: 100%; background: var(--accent); }
-
-    .hamburger.open span:nth-child(1) {
-      width: 100%;
-      transform: translateY(7.5px) rotate(45deg);
-      background: var(--text-white);
-    }
-    .hamburger.open span:nth-child(2) {
-      width: 100%;
-      opacity: 0;
-      transform: scaleX(0);
-      animation: none;
-    }
-    .hamburger.open span:nth-child(3) {
-      width: 100%;
-      transform: translateY(-7.5px) rotate(-45deg);
-      background: var(--text-white);
-    }
-
-    /* ─── INLINE SLIDING NAV LINKS ─── */
-    .nav-links-inline {
-      display: flex;
-      align-items: center;
-      gap: 2.2rem;
-      opacity: 0;
-      transform: translateX(40px);
-      pointer-events: none;
-      transition:
-        opacity   0.5s  cubic-bezier(0.76, 0, 0.24, 1),
-        transform 0.55s cubic-bezier(0.76, 0, 0.24, 1);
-      flex: 1;
-      justify-content: flex-end;
-      padding-right: 2.5rem;
-    }
-    .nav-links-inline.open {
-      opacity: 1;
-      transform: translateX(0);
-      pointer-events: all;
-    }
-    .nav-links-inline a {
-      text-decoration: none;
-      color: rgba(245,245,245,0.75);
-      font-size: 0.7rem;
-      font-weight: 700;
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-      white-space: nowrap;
-      cursor: pointer;
-      position: relative;
-      padding-bottom: 2px;
-      opacity: 0;
-      transform: translateX(20px);
-      transition:
-        color     0.25s ease,
-        opacity   0.45s cubic-bezier(0.76, 0, 0.24, 1),
-        transform 0.45s cubic-bezier(0.76, 0, 0.24, 1);
-    }
-    .nav-links-inline a::after {
-      content: '';
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 1px;
-      background: var(--accent);
-      transform: scaleX(0);
-      transform-origin: left;
-      transition: transform 0.28s ease;
-    }
+    .hamburger.open span:nth-child(1) { width: 100%; transform: translateY(7.5px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); animation: none; }
+    .hamburger.open span:nth-child(3) { width: 100%; transform: translateY(-7.5px) rotate(-45deg); }
+    .nav-links-inline { display: flex; align-items: center; gap: 2.2rem; opacity: 0; transform: translateX(40px); pointer-events: none; transition: opacity 0.5s cubic-bezier(0.76,0,0.24,1), transform 0.55s cubic-bezier(0.76,0,0.24,1); flex: 1; justify-content: flex-end; padding-right: 2.5rem; }
+    .nav-links-inline.open { opacity: 1; transform: translateX(0); pointer-events: all; }
+    .nav-links-inline a { text-decoration: none; color: rgba(245,245,245,0.75); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; white-space: nowrap; cursor: pointer; position: relative; padding-bottom: 2px; opacity: 0; transform: translateX(20px); transition: color 0.25s ease, opacity 0.45s cubic-bezier(0.76,0,0.24,1), transform 0.45s cubic-bezier(0.76,0,0.24,1); }
+    .nav-links-inline a::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: var(--accent); transform: scaleX(0); transform-origin: left; transition: transform 0.28s ease; }
     .nav-links-inline a:hover { color: var(--text-white); }
     .nav-links-inline a:hover::after { transform: scaleX(1); }
+    .nav-links-inline a.active-nav { color: var(--accent); }
+    .nav-links-inline a.active-nav::after { transform: scaleX(1); }
+    .nav-links-inline.open a:nth-child(1) { opacity:1; transform:translateX(0); transition-delay:0.06s; }
+    .nav-links-inline.open a:nth-child(2) { opacity:1; transform:translateX(0); transition-delay:0.12s; }
+    .nav-links-inline.open a:nth-child(3) { opacity:1; transform:translateX(0); transition-delay:0.18s; }
+    .nav-links-inline.open a:nth-child(4) { opacity:1; transform:translateX(0); transition-delay:0.24s; }
+    .nav-links-inline.open a:nth-child(5) { opacity:1; transform:translateX(0); transition-delay:0.30s; }
+    .nav-links-inline:not(.open) a:nth-child(1) { transition-delay:0.16s; }
+    .nav-links-inline:not(.open) a:nth-child(2) { transition-delay:0.10s; }
+    .nav-links-inline:not(.open) a:nth-child(3) { transition-delay:0.05s; }
+    .nav-links-inline:not(.open) a:nth-child(4) { transition-delay:0.02s; }
+    .nav-links-inline:not(.open) a:nth-child(5) { transition-delay:0s; }
+    .mobile-menu-backdrop { display: none; position: fixed; inset: 0; z-index: 98; background: rgba(5,8,16,0); backdrop-filter: blur(0px); pointer-events: none; transition: background 0.4s ease, backdrop-filter 0.4s ease; }
+    .mobile-menu-backdrop.open { background: rgba(5,8,16,0.3); backdrop-filter: blur(6px); pointer-events: all; }
+    .mobile-menu-panel { display: none; position: fixed; top: 0; left: 0; right: 0; height: 33.33vh; z-index: 99; background: rgba(10,13,26,0.92); backdrop-filter: blur(20px); flex-direction: column; justify-content: flex-end; padding: 0 2rem 2rem; transform: translateY(-100%); transition: transform 0.45s cubic-bezier(0.76,0,0.24,1); border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .mobile-menu-panel.open { transform: translateY(0); }
+    .mobile-menu-panel a { display: block; text-decoration: none; color: rgba(245,245,245,0.7); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.25em; text-transform: uppercase; padding: 0.9rem 0; border-bottom: 1px solid rgba(255,255,255,0.06); cursor: pointer; opacity: 0; transform: translateY(-8px); transition: color 0.2s ease, opacity 0.35s ease, transform 0.35s ease; }
+    .mobile-menu-panel a:last-child { border-bottom: none; }
+    .mobile-menu-panel a:hover { color: var(--accent); }
+    .mobile-menu-panel.open a:nth-child(1) { opacity:1; transform:translateY(0); transition-delay:0.12s; }
+    .mobile-menu-panel.open a:nth-child(2) { opacity:1; transform:translateY(0); transition-delay:0.18s; }
+    .mobile-menu-panel.open a:nth-child(3) { opacity:1; transform:translateY(0); transition-delay:0.24s; }
+    .mobile-menu-panel.open a:nth-child(4) { opacity:1; transform:translateY(0); transition-delay:0.30s; }
+    .mobile-menu-panel.open a:nth-child(5) { opacity:1; transform:translateY(0); transition-delay:0.36s; }
 
-    /* Staggered open — each link slides in with a delay */
-    .nav-links-inline.open a:nth-child(1) { opacity:1; transform:translateX(0); transition-delay: 0.08s; }
-    .nav-links-inline.open a:nth-child(2) { opacity:1; transform:translateX(0); transition-delay: 0.16s; }
-    .nav-links-inline.open a:nth-child(3) { opacity:1; transform:translateX(0); transition-delay: 0.24s; }
-
-    /* Staggered close — reverse order, snappier */
-    .nav-links-inline:not(.open) a:nth-child(1) { transition-delay: 0.12s; }
-    .nav-links-inline:not(.open) a:nth-child(2) { transition-delay: 0.06s; }
-    .nav-links-inline:not(.open) a:nth-child(3) { transition-delay: 0s; }
-
-    /* ─── HERO — sticky so prototype slides over it ─── */
-    .hero {
-      position: sticky;
-      top: 0;
-      z-index: 1;
-      min-height: 100vh;
-      background:
-        radial-gradient(ellipse at 70% 30%, #1e2a45 0%, transparent 55%),
-        radial-gradient(ellipse at 30% 70%, #12182e 0%, transparent 50%),
-        linear-gradient(160deg, #0f1628 0%, #080d1a 50%, #050810 100%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-    }
-    /* ─── HERO SCROLL BLUR OVERLAY ─── */
-    .hero-blur-overlay {
-      position: absolute;
-      inset: 0;
-      z-index: 3;
-      pointer-events: none;
-      backdrop-filter: blur(0px);
-      -webkit-backdrop-filter: blur(0px);
-      background: rgba(5, 8, 16, 0);
-      will-change: backdrop-filter, background;
-    }
-
-    .rocket-hero-wrap {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 500px;         /* ← rocket width */
-      display: flex;
-      align-items: flex-end;
-    }
-    .rocket-hero-wrap > img:first-child {
-      width: 100%;
-      height: auto;
-      object-fit: contain;
-      display: block;
-    }
-
-    /* ── SATELLITE — every number is independently adjustable ── */
-    .satellite-img {
-      position: absolute;
-      left: 300px;          /* ← X position (px) */
-      bottom: 190px;        /* ← Y position (px) */
-      width: 400px;         /* ← size (px) */
-      height: auto;
-      object-fit: contain;
-      transform-origin: center center;
-      transform:
-        rotate(-25deg)      /* ← rotation (deg): + clockwise, - counter-clockwise */
-        scaleX(1)           /* ← flip horizontal: 1 = normal, -1 = mirror */
-        scaleY(1);          /* ← flip vertical:   1 = normal, -1 = upside down */
-    }
-
-    .hero-text {
-      position: absolute;
-      bottom: 22%;
-      right: 6%;
-      text-align: center;
-    }
-    .hero-text h1 {
-      font-size: 2.2rem;
-      font-weight: 700;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      margin-bottom: 0.75rem;
-    }
-    .hero-text p {
-      font-size: 0.6rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      max-width: 200px;
-      line-height: 1.7;
-      margin-bottom: 1.4rem;
-    }
-    .btn-outline {
-      display: inline-block;
-      padding: 0.45rem 1.2rem;
-      border: 1px solid var(--text-white);
-      border-radius: 999px;
-      font-size: 0.65rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--text-white);
-      text-decoration: none;
-      cursor: pointer;
-      background: none;
-      font-family: inherit;
-      transition: background 0.2s, color 0.2s;
-    }
+    /* HERO */
+    .hero { position: sticky; top: 0; z-index: 1; min-height: 100vh; background: radial-gradient(ellipse at 70% 30%, #2a3d6e 0%, transparent 55%), radial-gradient(ellipse at 30% 70%, #1a2545 0%, transparent 50%), linear-gradient(160deg, #172040 0%, #0e1630 50%, #0a1020 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
+    .hero-blur-overlay { position: absolute; inset: 0; z-index: 3; pointer-events: none; background: rgba(5,8,16,0); }
+    .rocket-hero-wrap { position: absolute; bottom: 0; left: 0; width: 500px; display: flex; align-items: flex-end; }
+    .img-desktop { display: block; width: 100%; height: auto; object-fit: contain; }
+    .img-mobile { display: none; position: absolute; width: 200px; bottom: 0; left: 0; height: auto; object-fit: contain; }
+    .satellite-img { position: absolute; left: 350px; bottom: 190px; width: 400px; height: auto; object-fit: contain; transform-origin: center; transform: rotate(0deg) scaleX(1) scaleY(1); }
+    .hero-text { position: absolute; bottom: 22%; right: 6%; text-align: right; }
+    .hero-text h1 { font-size: 2.2rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 0.75rem; }
+    .hero-text p { font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); max-width: 200px; line-height: 1.7; margin-bottom: 1.4rem; }
+    .btn-outline { display: inline-block; padding: 0.45rem 1.2rem; border: 1px solid var(--text-white); border-radius: 999px; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-white); text-decoration: none; cursor: pointer; background: none; font-family: inherit; transition: background 0.2s, color 0.2s; }
     .btn-outline:hover { background: var(--text-white); color: var(--black); }
+    .scroll-arrow { position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%); color: var(--text-white); font-size: 1.4rem; cursor: pointer; background: none; border: none; animation: bounce 1.6s infinite; }
+    @keyframes bounce { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(7px); } }
 
-    .scroll-arrow {
-      position: absolute;
-      bottom: 2rem;
-      left: 50%;
-      transform: translateX(-50%);
-      color: var(--text-white);
-      font-size: 1.4rem;
-      text-decoration: none;
-      cursor: pointer;
-      background: none;
-      border: none;
-      animation: bounce 1.6s infinite;
-    }
-    @keyframes bounce {
-      0%, 100% { transform: translateX(-50%) translateY(0); }
-      50%       { transform: translateX(-50%) translateY(7px); }
-    }
+    /* OVERLAP SLIDES */
+    .home-scroll-wrap { position: relative; isolation: isolate; }
+    .overlap-slide { position: sticky; top: 0; min-height: 100vh; box-shadow: 0 -32px 80px rgba(0,0,0,0.95); display: flex; align-items: stretch; overflow: hidden; }
+    #slide-speck1 { z-index: 2; }
+    #slide-speck2 { z-index: 3; }
+    .overlap-slide::before { content: ''; position: absolute; inset: 0; z-index: 0; background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px); background-size: 60px 60px; pointer-events: none; }
+    .slide-speck1 { background: radial-gradient(ellipse at 20% 50%, #1e1535 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, #122040 0%, transparent 55%), linear-gradient(180deg, #0e1525 0%, #131d30 50%, #111828 100%); }
+    .slide-speck2 { background: radial-gradient(ellipse at 75% 40%, #2a1812 0%, transparent 55%), radial-gradient(ellipse at 25% 70%, #0f1e35 0%, transparent 50%), linear-gradient(160deg, #14100a 0%, #0f1820 50%, #0c151e 100%); }
+    .slide-left { position: relative; z-index: 1; flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 6rem 5% 6rem 8%; border-right: 1px solid rgba(255,255,255,0.06); }
+    .slide-right { position: relative; z-index: 1; flex: 1; display: flex; align-items: center; justify-content: center; padding: 6rem 8% 6rem 5%; }
+    .slide-eyebrow { font-size: 0.6rem; letter-spacing: 0.35em; text-transform: uppercase; color: var(--accent); margin-bottom: 1.2rem; display: block; }
+    .slide-title { font-size: 4.5rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; line-height: 0.9; margin-bottom: 1.8rem; color: transparent; -webkit-text-stroke: 1px rgba(245,245,245,0.7); }
+    .slide-title span { color: var(--text-white); -webkit-text-stroke: 0; }
+    .slide-divider { width: 2rem; height: 1px; background: var(--accent); margin-bottom: 1.8rem; }
+    .slide-desc { font-size: 0.82rem; line-height: 1.85; color: var(--text-muted); font-family: Georgia, serif; font-style: italic; max-width: 380px; margin-bottom: 2.5rem; }
+    .slide-badge { display: inline-flex; align-items: center; gap: 0.6rem; padding: 0.4rem 1rem; border: 1px solid rgba(192,83,42,0.4); border-radius: 999px; font-size: 0.58rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 2rem; }
+    .slide-badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); animation: blink 1.4s ease-in-out infinite; }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+    .btn-slide { display: inline-block; padding: 0.55rem 1.5rem; border: 1px solid var(--text-white); border-radius: 999px; font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-white); cursor: pointer; background: none; font-family: inherit; transition: background 0.2s, color 0.2s; align-self: flex-start; }
+    .btn-slide:hover { background: var(--text-white); color: var(--black); }
+    .slide-img-wrap { width: 100%; max-width: 420px; display: flex; align-items: center; justify-content: center; }
+    .slide-img-wrap img { width: 100%; height: auto; object-fit: contain; display: block; }
+    .slide-img-placeholder { width: 100%; aspect-ratio: 3/4; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.8rem; color: rgba(255,255,255,0.15); font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; }
+    .slide-img-placeholder svg { width: 36px; height: 36px; opacity: 0.2; }
+    .proto-corner { position: absolute; width: 36px; height: 36px; opacity: 0.2; }
+    .proto-corner.tl { top: 2rem; left: 2rem; border-top: 1px solid #fff; border-left: 1px solid #fff; }
+    .proto-corner.tr { top: 2rem; right: 2rem; border-top: 1px solid #fff; border-right: 1px solid #fff; }
+    .proto-corner.bl { bottom: 2rem; left: 2rem; border-bottom: 1px solid #fff; border-left: 1px solid #fff; }
+    .proto-corner.br { bottom: 2rem; right: 2rem; border-bottom: 1px solid #fff; border-right: 1px solid #fff; }
 
-    /* ─── PROJECTS PAGE ─── */
-    .projects-page {
-      min-height: 100vh;
-      background: var(--mid-gray);
-      padding-top: 90px;
-    }
-    .projects-hero {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 5rem 8%;
-      gap: 4rem;
-      min-height: 80vh;
-    }
-    .product-info { max-width: 420px; }
-    .product-info h2 {
-      font-size: 3rem;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      margin-bottom: 0.4rem;
-    }
-    .subtitle {
-      font-size: 0.75rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      margin-bottom: 2rem;
-    }
-    .product-info p.desc {
-      font-size: 0.95rem;
-      line-height: 1.8;
-      color: var(--text-white);
-      margin-bottom: 2.5rem;
-      font-family: Georgia, serif;
-      font-style: italic;
-    }
-    .rocket-wrap {
-      flex-shrink: 0;
-      width: 200px;
-    }
-    .rocket-wrap img {
-      width: 100%;
-      height: auto;
-      object-fit: contain;
-    }
-    .rocket-placeholder {
-      width: 100%;
-      height: 400px;
-      background: linear-gradient(180deg, #e8e4d8, #b0ac98);
-      border-radius: 80px 80px 20px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #666;
-      font-size: 0.7rem;
-      letter-spacing: 0.1em;
-      writing-mode: vertical-rl;
-    }
-    .projects-specs {
-      background: var(--dark-gray);
-      padding: 4rem 8%;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 2rem;
-    }
-    .spec-card {
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 8px;
-      padding: 2rem 1.5rem;
-    }
-    .spec-card h3 {
-      font-size: 0.7rem;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 0.8rem;
-    }
-    .spec-card p {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      line-height: 1.7;
-    }
+    /* FOOTER */
+    footer { position: relative; z-index: 4; background: #050508; border-top: 1px solid #1f1f1f; padding: 2.2rem 2.5rem 1.6rem; display: grid; grid-template-columns: 1fr auto 1fr; align-items: start; gap: 1.5rem; }
+    .footer-left { display: flex; flex-direction: column; gap: 0.4rem; }
+    .footer-copy { color: #555; font-size: 0.7rem; letter-spacing: 0.1em; }
+    .footer-privacy { color: #444; font-size: 0.6rem; letter-spacing: 0.08em; max-width: 260px; line-height: 1.6; margin-top: 0.4rem; }
+    .footer-privacy a { color: #666; text-decoration: underline; cursor: pointer; transition: color 0.2s; }
+    .footer-privacy a:hover { color: var(--accent); }
+    .footer-center { display: flex; flex-direction: column; align-items: center; }
+    .footer-nav { display: flex; gap: 1.6rem; }
+    .footer-nav a { color: #666; font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; cursor: pointer; text-decoration: none; transition: color 0.2s; }
+    .footer-nav a:hover { color: var(--accent); }
+    .footer-right { display: flex; justify-content: flex-end; }
+    .footer-socials { display: flex; gap: 0.9rem; }
+    .footer-socials a { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: 1px solid #222; border-radius: 6px; color: #666; text-decoration: none; transition: border-color 0.2s, color 0.2s, background 0.2s; }
+    .footer-socials a:hover { border-color: var(--accent); color: var(--accent); background: rgba(192,83,42,0.08); }
+    .footer-socials svg { width: 14px; height: 14px; fill: currentColor; }
 
-    /* ─── ABOUT PAGE ─── */
-    .about-page {
-      min-height: 100vh;
-      background: var(--dark-gray);
-      padding-top: 90px;
-    }
-    .about-header {
-      padding: 5rem 8% 3rem;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
-    }
-    .about-header h1 {
-      font-size: 3.5rem;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      margin-bottom: 0.5rem;
-    }
-    .about-header p.tag {
-      font-size: 0.7rem;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: var(--accent);
-    }
-    .about-body {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0;
-    }
-    .about-col {
-      padding: 4rem 8%;
-      border-right: 1px solid rgba(255,255,255,0.06);
-    }
+    /* PROJECTS PAGE */
+    .projects-page { background: var(--proj-bg); padding-top: 80px; font-family: -apple-system, 'Segoe UI', sans-serif; }
+    .proj-header { padding: 4rem 8% 3rem; border-bottom: 1px solid var(--proj-border); background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #0d1117 100%); position: relative; overflow: hidden; }
+    .proj-header::before { content: ''; position: absolute; top: -60px; right: -60px; width: 300px; height: 300px; background: radial-gradient(ellipse, rgba(88,166,255,0.08) 0%, transparent 70%); pointer-events: none; }
+    .proj-header h1 { font-size: 3rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 0.4rem; color: var(--proj-text); font-family: 'Courier New', Courier, monospace; }
+    .proj-header p.tag { font-size: 0.65rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--proj-accent); font-family: 'Courier New', Courier, monospace; }
+    .proj-speck { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid var(--proj-border); min-height: 80vh; }
+    .proj-speck-info { padding: 4rem 8%; display: flex; flex-direction: column; justify-content: center; border-right: 1px solid var(--proj-border); background: var(--proj-surface); }
+    .proj-speck-info .section-label { font-size: 0.6rem; letter-spacing: 0.35em; text-transform: uppercase; color: var(--proj-accent); margin-bottom: 1rem; font-family: 'Courier New', Courier, monospace; }
+    .proj-speck-info h2 { font-size: 2.5rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.4rem; color: var(--proj-text); font-family: 'Courier New', Courier, monospace; }
+    .proj-speck-info .vehicle-type { font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--proj-muted); margin-bottom: 2rem; font-family: 'Courier New', Courier, monospace; }
+    .proj-speck-info p { font-size: 0.9rem; line-height: 1.9; color: var(--proj-muted); font-family: Georgia, serif; margin-bottom: 2.5rem; }
+    .spec-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--proj-border); border: 1px solid var(--proj-border); border-radius: 8px; overflow: hidden; margin-bottom: 2.5rem; }
+    .spec-item { background: #0d1117; padding: 1rem 1.2rem; transition: background 0.2s; }
+    .spec-item:hover { background: #161b22; }
+    .spec-item .spec-label { font-size: 0.55rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--proj-muted); margin-bottom: 0.3rem; font-family: 'Courier New', Courier, monospace; }
+    .spec-item .spec-val { font-size: 1rem; font-weight: 700; color: var(--proj-text); font-family: 'Courier New', Courier, monospace; }
+    .spec-item .spec-unit { font-size: 0.6rem; color: var(--proj-accent); margin-left: 0.2rem; }
+    .proj-speck-image { padding: 4rem 8%; display: flex; align-items: center; justify-content: center; background: #080c10; }
+    .proj-speck-image img { max-width: 280px; width: 100%; height: auto; object-fit: contain; }
+    .proj-img-placeholder { width: 100%; max-width: 280px; aspect-ratio: 1/2; border: 1px solid rgba(88,166,255,0.15); border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.6rem; color: rgba(88,166,255,0.2); font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase; font-family: 'Courier New', Courier, monospace; }
+    .proj-timeline { padding: 4rem 8%; border-bottom: 1px solid var(--proj-border); background: var(--proj-bg); }
+    .proj-timeline h2 { font-size: 0.65rem; letter-spacing: 0.35em; text-transform: uppercase; color: var(--proj-accent); margin-bottom: 2.5rem; font-family: 'Courier New', Courier, monospace; }
+    .timeline-track { position: relative; padding-left: 2rem; }
+    .timeline-track::before { content: ''; position: absolute; left: 0; top: 0.5rem; bottom: 0.5rem; width: 1px; background: var(--proj-border); }
+    .timeline-item { position: relative; margin-bottom: 2.5rem; }
+    .timeline-item:last-child { margin-bottom: 0; }
+    .timeline-dot { position: absolute; left: -2rem; top: 0.35rem; width: 8px; height: 8px; border-radius: 50%; background: var(--proj-bg); border: 1.5px solid var(--proj-accent); transform: translateX(-3.5px); }
+    .timeline-item.done .timeline-dot { background: var(--proj-accent2); border-color: var(--proj-accent2); }
+    .timeline-item.active-phase .timeline-dot { background: var(--proj-accent); border-color: var(--proj-accent); box-shadow: 0 0 0 3px rgba(88,166,255,0.25); }
+    .timeline-date { font-size: 0.58rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--proj-accent); margin-bottom: 0.3rem; font-family: 'Courier New', Courier, monospace; }
+    .timeline-title { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.4rem; color: var(--proj-text); font-family: 'Courier New', Courier, monospace; }
+    .timeline-desc { font-size: 0.8rem; color: var(--proj-muted); line-height: 1.7; font-family: Georgia, serif; }
+    .timeline-tag { display: inline-block; margin-top: 0.5rem; padding: 0.2rem 0.7rem; border: 1px solid rgba(88,166,255,0.3); border-radius: 999px; font-size: 0.55rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--proj-accent); font-family: 'Courier New', Courier, monospace; }
+    .timeline-tag.done-tag { border-color: rgba(63,185,80,0.35); color: var(--proj-accent2); }
+    .timeline-tag.wip-tag { border-color: rgba(88,166,255,0.4); color: var(--proj-accent); }
+    .timeline-tag.planned-tag { border-color: rgba(255,255,255,0.12); color: var(--proj-muted); }
+    .proj-fullscale { padding: 5rem 8%; border-bottom: 1px solid var(--proj-border); background: var(--proj-surface); }
+    .proj-fullscale-header { margin-bottom: 3rem; }
+    .proj-fullscale-header .section-label { font-size: 0.6rem; letter-spacing: 0.35em; text-transform: uppercase; color: var(--proj-accent); margin-bottom: 0.8rem; display: block; font-family: 'Courier New', Courier, monospace; }
+    .proj-fullscale-header h2 { font-size: 2.2rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.8rem; color: var(--proj-text); font-family: 'Courier New', Courier, monospace; }
+    .proj-fullscale-header p { font-size: 0.88rem; line-height: 1.85; color: var(--proj-muted); font-family: Georgia, serif; max-width: 680px; }
+    .fullscale-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--proj-border); border: 1px solid var(--proj-border); border-radius: 10px; overflow: hidden; margin-bottom: 3rem; }
+    .fs-card { background: #0d1117; padding: 2rem 1.5rem; transition: background 0.2s; }
+    .fs-card:hover { background: #131920; }
+    .fs-card-label { font-size: 0.55rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--proj-muted); margin-bottom: 0.5rem; font-family: 'Courier New', Courier, monospace; }
+    .fs-card-value { font-size: 1.8rem; font-weight: 700; color: var(--proj-text); line-height: 1; margin-bottom: 0.2rem; font-family: 'Courier New', Courier, monospace; }
+    .fs-card-unit { font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--proj-accent); font-family: 'Courier New', Courier, monospace; }
+    .fs-card-note { font-size: 0.7rem; color: var(--proj-muted); margin-top: 0.5rem; line-height: 1.5; font-family: Georgia, serif; }
+    .fullscale-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; }
+    .fs-col h3 { font-size: 0.65rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--proj-accent); margin-bottom: 1.5rem; padding-bottom: 0.8rem; border-bottom: 1px solid var(--proj-border); font-family: 'Courier New', Courier, monospace; }
+    .fs-row { display: flex; justify-content: space-between; align-items: baseline; padding: 0.7rem 0; border-bottom: 1px solid rgba(48,54,61,0.5); }
+    .fs-row:last-child { border-bottom: none; }
+    .fs-row-label { font-size: 0.72rem; color: var(--proj-muted); font-family: 'Courier New', Courier, monospace; }
+    .fs-row-val { font-size: 0.72rem; font-weight: 700; color: var(--proj-text); font-family: 'Courier New', Courier, monospace; }
+    .projects-page footer { background: #080c10; border-top: 1px solid var(--proj-border); }
+    .projects-page footer .footer-copy { color: var(--proj-muted); }
+    .projects-page footer .footer-privacy a { color: #4a5568; }
+    .projects-page footer .footer-nav a { color: var(--proj-muted); }
+    .projects-page footer .footer-socials a { border-color: var(--proj-border); color: var(--proj-muted); }
+    .projects-page footer .footer-socials a:hover { border-color: var(--proj-accent); color: var(--proj-accent); background: rgba(88,166,255,0.08); }
+
+    /* ABOUT PAGE */
+    .about-page { min-height: 100vh; background: var(--dark-gray); padding-top: 90px; }
+    .about-header { padding: 5rem 8% 3rem; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .about-header h1 { font-size: 3.5rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 0.5rem; }
+    .about-header p.tag { font-size: 0.7rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--accent); }
+    .about-body { display: grid; grid-template-columns: 1fr 1fr; }
+    .about-col { padding: 4rem 8%; border-right: 1px solid rgba(255,255,255,0.06); }
     .about-col:last-child { border-right: none; }
-    .about-col h2 {
-      font-size: 1.1rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      margin-bottom: 1.5rem;
-      color: var(--text-white);
-    }
-    .about-col p {
-      font-size: 0.95rem;
-      line-height: 1.9;
-      color: var(--text-muted);
-      font-family: Georgia, serif;
-    }
-    .about-values {
-      padding: 4rem 8%;
-      background: var(--black);
-    }
-    .about-values h2 {
-      font-size: 0.7rem;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 2.5rem;
-    }
-    .values-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1.5rem;
-    }
-    .value-item {
-      padding: 1.5rem;
-      border: 1px solid rgba(255,255,255,0.07);
-      border-radius: 6px;
-    }
-    .value-item .num {
-      font-size: 2rem;
-      font-weight: 700;
-      color: rgba(192, 83, 42, 0.3);
-      margin-bottom: 0.5rem;
-    }
-    .value-item h3 {
-      font-size: 0.75rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      margin-bottom: 0.5rem;
-    }
-    .value-item p {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      line-height: 1.6;
-    }
+    .about-col h2 { font-size: 1.1rem; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 1.5rem; }
+    .about-col p { font-size: 0.95rem; line-height: 1.9; color: var(--text-muted); font-family: Georgia, serif; }
+    .about-values { padding: 4rem 8%; background: var(--black); }
+    .about-values h2 { font-size: 0.7rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--accent); margin-bottom: 2.5rem; }
+    .values-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
+    .value-item { padding: 1.5rem; border: 1px solid rgba(255,255,255,0.07); border-radius: 6px; }
+    .value-item .num { font-size: 2rem; font-weight: 700; color: rgba(192,83,42,0.3); margin-bottom: 0.5rem; }
+    .value-item h3 { font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 0.5rem; }
+    .value-item p { font-size: 0.8rem; color: var(--text-muted); line-height: 1.6; }
 
-    /* ─── CONTACT PAGE ─── */
-    .contact-page {
-      min-height: 100vh;
-      background: var(--black);
-      padding-top: 90px;
-      display: flex;
-      flex-direction: column;
-    }
-    .contact-header {
-      padding: 5rem 8% 3rem;
-      border-bottom: 1px solid #1a1a1a;
-      text-align: center;
-    }
-    .contact-header h1 {
-      font-size: 3.5rem;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      margin-bottom: 0.5rem;
-    }
-    .contact-header p.tag {
-      font-size: 0.7rem;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: var(--accent);
-    }
-    .contact-body {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      flex: 1;
-    }
-    .contact-info {
-      padding: 4rem 8%;
-      border-right: 1px solid #1a1a1a;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-    .contact-info h2 {
-      font-size: 0.7rem;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 2rem;
-    }
-    .contact-detail {
-      margin-bottom: 2rem;
-    }
-    .contact-detail h3 {
-      font-size: 0.65rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      margin-bottom: 0.4rem;
-    }
-    .contact-detail p {
-      font-size: 0.95rem;
-      color: var(--text-white);
-    }
-    .contact-detail a {
-      font-size: 0.95rem;
-      color: var(--text-white);
-      text-decoration: none;
-      transition: color 0.2s;
-    }
+    /* CONTACT PAGE */
+    .contact-page { min-height: 100vh; background: var(--black); padding-top: 90px; display: flex; flex-direction: column; }
+    .contact-header { padding: 5rem 8% 3rem; border-bottom: 1px solid #1a1a1a; text-align: center; }
+    .contact-header h1 { font-size: 3.5rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 0.5rem; }
+    .contact-header p.tag { font-size: 0.7rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--accent); }
+    .contact-body { display: grid; grid-template-columns: 1fr 1fr; flex: 1; }
+    .contact-info { padding: 4rem 8%; border-right: 1px solid #1a1a1a; display: flex; flex-direction: column; justify-content: center; }
+    .contact-info h2 { font-size: 0.7rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--accent); margin-bottom: 2rem; }
+    .contact-detail { margin-bottom: 2rem; }
+    .contact-detail h3 { font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.4rem; }
+    .contact-detail p { font-size: 0.95rem; color: var(--text-white); }
+    .contact-detail a { font-size: 0.95rem; color: var(--text-white); text-decoration: none; transition: color 0.2s; }
     .contact-detail a:hover { color: var(--accent); }
-    .contact-form-side {
-      padding: 4rem 8%;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-    .contact-form-side h2 {
-      font-size: 0.7rem;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 2rem;
-    }
-    .form-row {
-      margin-bottom: 1.5rem;
-    }
-    .form-row label {
-      display: block;
-      font-size: 0.65rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      margin-bottom: 0.5rem;
-    }
-    .form-row input,
-    .form-row textarea {
-      width: 100%;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 4px;
-      padding: 0.75rem 1rem;
-      color: var(--text-white);
-      font-family: 'Courier New', Courier, monospace;
-      font-size: 0.85rem;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-    .form-row input:focus,
-    .form-row textarea:focus { border-color: var(--accent); }
+    .contact-socials-section { margin-top: 0.5rem; }
+    .contact-socials-section h3 { font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 1rem; }
+    .contact-social-links { display: flex; flex-direction: column; gap: 0.7rem; }
+    .contact-social-link { display: flex; align-items: center; gap: 0.9rem; padding: 0.7rem 1rem; border: 1px solid rgba(255,255,255,0.07); border-radius: 6px; text-decoration: none; color: var(--text-muted); transition: border-color 0.2s, color 0.2s, background 0.2s; }
+    .contact-social-link:hover { border-color: var(--accent); color: var(--text-white); background: rgba(192,83,42,0.06); }
+    .contact-social-link svg { width: 16px; height: 16px; fill: currentColor; flex-shrink: 0; }
+    .contact-social-link .social-name { font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase; }
+    .contact-social-link .social-handle { font-size: 0.65rem; color: inherit; opacity: 0.6; margin-left: auto; }
+    .contact-form-side { padding: 4rem 8%; display: flex; flex-direction: column; justify-content: center; }
+    .contact-form-side h2 { font-size: 0.7rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--accent); margin-bottom: 2rem; }
+    .form-row { margin-bottom: 1.5rem; }
+    .form-row label { display: block; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem; }
+    .form-row input, .form-row textarea { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 0.75rem 1rem; color: var(--text-white); font-family: 'Courier New', Courier, monospace; font-size: 0.85rem; outline: none; transition: border-color 0.2s; }
+    .form-row input:focus, .form-row textarea:focus { border-color: var(--accent); }
     .form-row textarea { resize: vertical; min-height: 120px; }
-    .btn-send {
-      display: inline-block;
-      padding: 0.6rem 1.8rem;
-      border: 1px solid var(--accent);
-      border-radius: 999px;
-      font-size: 0.65rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--accent);
-      background: none;
-      font-family: 'Courier New', Courier, monospace;
-      cursor: pointer;
-      transition: background 0.2s, color 0.2s;
-    }
-    .btn-send:hover { background: var(--accent); color: var(--text-white); }
 
-    /* ─── FOOTER ─── */
-    footer {
-      background: var(--black);
-      border-top: 1px solid #1f1f1f;
-      padding: 1.5rem 2.5rem;
-      display: flex;
-      justify-content: space-between;
-      color: #555;
-      font-size: 0.7rem;
-      letter-spacing: 0.1em;
-    }
+    /* ── SEND BUTTON + STATES ── */
+    .btn-send { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.65rem 1.8rem; border: 1px solid var(--accent); border-radius: 999px; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); background: none; font-family: 'Courier New', Courier, monospace; cursor: pointer; transition: background 0.2s, color 0.2s, opacity 0.2s; }
+    .btn-send:hover:not(:disabled) { background: var(--accent); color: var(--text-white); }
+    .btn-send:disabled { opacity: 0.5; cursor: not-allowed; }
+    .form-status { margin-top: 1rem; font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; padding: 0.7rem 1rem; border-radius: 6px; display: none; }
+    .form-status.success { display: block; color: #3fb950; border: 1px solid rgba(63,185,80,0.3); background: rgba(63,185,80,0.06); }
+    .form-status.error { display: block; color: #f85149; border: 1px solid rgba(248,81,73,0.3); background: rgba(248,81,73,0.06); }
 
-    /* ─── MOBILE ─── */
+    /* SUPPORT PAGE */
+    .support-page { background: var(--black); padding-top: 80px; min-height: 100vh; }
+    .support-hero { padding: 5rem 8% 4rem; background: radial-gradient(ellipse at 60% 0%, rgba(192,83,42,0.12) 0%, transparent 60%), linear-gradient(180deg, #0f0a06 0%, #0a0a0a 100%); border-bottom: 1px solid #1e1e1e; text-align: center; }
+    .support-hero .eyebrow { font-size: 0.6rem; letter-spacing: 0.35em; text-transform: uppercase; color: var(--accent); margin-bottom: 1.2rem; display: block; }
+    .support-hero h1 { font-size: 3rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 1rem; }
+    .support-hero h1 span { color: var(--accent); }
+    .support-hero .hero-desc { font-size: 0.9rem; line-height: 1.9; color: var(--text-muted); font-family: Georgia, serif; max-width: 600px; margin: 0 auto 2.5rem; }
+    .support-hero .hero-stats { display: flex; justify-content: center; gap: 4rem; margin-bottom: 2.5rem; }
+    .stat-item { text-align: center; }
+    .stat-val { font-size: 2rem; font-weight: 700; color: var(--text-white); display: block; }
+    .stat-label { font-size: 0.58rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-muted); }
+    .funding-progress { max-width: 560px; margin: 0 auto 1rem; }
+    .progress-track { height: 4px; background: #1e1e1e; border-radius: 999px; overflow: hidden; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), #e07040); border-radius: 999px; width: 0%; transition: width 1.2s ease; }
+    .progress-labels { display: flex; justify-content: space-between; margin-top: 0.5rem; font-size: 0.58rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-muted); }
+    .support-payment { padding: 3rem 8%; border-bottom: 1px solid #1e1e1e; }
+    .support-payment > h2 { font-size: 0.65rem; letter-spacing: 0.35em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.6rem; }
+    .support-payment > p.pay-sub { font-size: 0.8rem; color: var(--text-muted); font-family: Georgia, serif; margin-bottom: 2.5rem; }
+    .payment-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; align-items: stretch; }
+    .amount-panel { background: #070709; border: 1px solid #1e1e1e; border-radius: 10px; padding: 1.6rem; }
+    .amount-panel h3 { font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--accent); margin-bottom: 1.5rem; }
+    .preset-amounts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; margin-bottom: 1.2rem; }
+    .preset-btn { padding: 0.65rem 0; border: 1px solid #2a2a2a; border-radius: 6px; background: #0d0d0f; color: var(--text-muted); font-family: "Courier New", Courier, monospace; font-size: 0.78rem; cursor: pointer; transition: border-color 0.2s, color 0.2s, background 0.2s; }
+    .preset-btn:hover, .preset-btn.selected { border-color: var(--accent); color: var(--text-white); background: rgba(192,83,42,0.08); }
+    .custom-amount-wrap { display: flex; align-items: center; border: 1px solid #2a2a2a; border-radius: 6px; overflow: hidden; margin-bottom: 1.5rem; transition: border-color 0.2s; }
+    .custom-amount-wrap:focus-within { border-color: var(--accent); }
+    .custom-amount-wrap .currency { padding: 0 0.8rem; color: var(--text-muted); font-size: 0.85rem; background: #0d0d0f; height: 42px; display: flex; align-items: center; border-right: 1px solid #2a2a2a; }
+    .custom-amount-wrap input { flex: 1; background: #0d0d0f; border: none; outline: none; color: var(--text-white); font-family: "Courier New", Courier, monospace; font-size: 0.9rem; padding: 0 0.8rem; height: 42px; }
+    .amount-display { text-align: center; margin-bottom: 1.5rem; }
+    .amount-display .big-num { font-size: 2rem; font-weight: 700; color: var(--text-white); }
+    .amount-display .big-num span { font-size: 1rem; color: var(--text-muted); }
+    .rewards-unlock { background: rgba(192,83,42,0.06); border: 1px solid rgba(192,83,42,0.2); border-radius: 6px; padding: 0.9rem 1rem; margin-bottom: 1.5rem; font-size: 0.7rem; color: var(--accent); letter-spacing: 0.08em; line-height: 1.6; }
+    .rewards-unlock strong { color: var(--text-white); }
+    .btn-paynow {
+      width: 100%; padding: 0.9rem; border: none; border-radius: 8px;
+      background: var(--accent); color: #fff;
+      font-family: "Courier New", Courier, monospace; font-size: 0.72rem;
+      letter-spacing: 0.22em; text-transform: uppercase; cursor: pointer;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      display: flex; align-items: center; justify-content: center; gap: 0.6rem;
+      margin-bottom: 0.8rem; font-weight: 700;
+      box-shadow: 0 4px 20px rgba(192,83,42,0.3);
+    }
+    .btn-paynow:hover { background: #d4622f; transform: translateY(-2px); box-shadow: 0 6px 24px rgba(192,83,42,0.45); }
+    .btn-paynow:active { transform: translateY(0); }
+    .btn-paynow svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .btn-paynow:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .pay-divider { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.8rem; }
+    .pay-divider::before, .pay-divider::after { content: ""; flex: 1; height: 1px; background: #1e1e1e; }
+    .pay-divider span { font-size: 0.58rem; letter-spacing: 0.2em; text-transform: uppercase; color: #444; }
+    .upi-panel { background: #070709; border: 1px solid #1e1e1e; border-radius: 10px; padding: 1.6rem; display: flex; flex-direction: column; align-items: center; text-align: center; }
+    .upi-panel h3 { font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.5rem; align-self: flex-start; }
+    .upi-panel .upi-sub { font-size: 0.72rem; color: var(--text-muted); margin-bottom: 1.5rem; align-self: flex-start; font-family: Georgia, serif; }
+    .qr-box { width: 154px; height: 154px; background: #fff; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem; padding: 6px; }
+    .qr-box img { width: 100%; height: 100%; }
+    .upi-id-box { background: #0d0d0f; border: 1px solid #2a2a2a; border-radius: 6px; padding: 0.6rem 1rem; font-size: 0.78rem; color: var(--text-white); letter-spacing: 0.08em; margin-bottom: 0.6rem; width: 100%; text-align: center; word-break: break-all; }
+    .btn-copy-upi { background: none; border: 1px solid #2a2a2a; border-radius: 6px; color: var(--text-muted); font-family: "Courier New", Courier, monospace; font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase; padding: 0.4rem 1rem; cursor: pointer; transition: border-color 0.2s, color 0.2s; margin-bottom: 1.2rem; }
+    .btn-copy-upi:hover { border-color: var(--accent); color: var(--accent); }
+    .upi-note { font-size: 0.68rem; color: #555; line-height: 1.6; max-width: 200px; }
+    .upi-apps { display: flex; gap: 0.5rem; justify-content: center; margin-top: 1rem; flex-wrap: wrap; }
+    .upi-app-tag { font-size: 0.55rem; letter-spacing: 0.1em; text-transform: uppercase; border: 1px solid #2a2a2a; border-radius: 999px; padding: 0.2rem 0.6rem; color: #555; }
+    .support-rewards { padding: 3rem 8%; border-bottom: 1px solid #1e1e1e; }
+    .support-rewards h2 { font-size: 0.65rem; letter-spacing: 0.35em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.5rem; }
+    .support-rewards .rewards-intro { font-size: 0.8rem; color: var(--text-muted); font-family: Georgia, serif; margin-bottom: 2rem; }
+    .rewards-tiers-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: #1e1e1e; border: 1px solid #1e1e1e; border-radius: 10px; overflow: hidden; }
+    .reward-tier-col { background: #07070a; padding: 1.8rem 1.5rem; }
+    .reward-tier-col .rt-range { font-size: 0.6rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.3rem; }
+    .reward-tier-col .rt-name { font-size: 1rem; font-weight: 700; color: var(--text-white); margin-bottom: 1.2rem; border-bottom: 1px solid #1e1e1e; padding-bottom: 0.8rem; }
+    .reward-tier-col ul { list-style: none; }
+    .reward-tier-col ul li { font-size: 0.72rem; color: var(--text-muted); padding: 0.35rem 0; border-bottom: 1px solid rgba(255,255,255,0.03); display: flex; gap: 0.5rem; align-items: flex-start; font-family: Georgia, serif; }
+    .reward-tier-col ul li::before { content: "→"; color: var(--accent); flex-shrink: 0; font-family: monospace; }
+    .reward-tier-col ul li:last-child { border-bottom: none; }
+    .pay-success-overlay { display: none; position: fixed; inset: 0; z-index: 600; background: rgba(0,0,0,0.85); backdrop-filter: blur(12px); align-items: center; justify-content: center; }
+    .pay-success-overlay.open { display: flex; }
+    .pay-success-box { background: #08080b; border: 1px solid rgba(63,185,80,0.3); border-radius: 14px; max-width: 460px; width: 90%; padding: 3rem 2.5rem; text-align: center; }
+    .pay-success-icon { font-size: 3rem; margin-bottom: 1rem; }
+    .pay-success-box h2 { font-size: 1rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-white); margin-bottom: 0.5rem; }
+    .pay-success-box p { font-size: 0.82rem; color: var(--text-muted); line-height: 1.8; font-family: Georgia, serif; margin-bottom: 1.5rem; }
+    .pay-success-box .pay-ref { font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); background: rgba(192,83,42,0.08); border: 1px solid rgba(192,83,42,0.2); border-radius: 6px; padding: 0.5rem 1rem; display: inline-block; margin-bottom: 1.5rem; }
+    .pay-success-close { background: none; border: 1px solid #2a2a2a; border-radius: 6px; color: var(--text-muted); font-family: "Courier New", Courier, monospace; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; padding: 0.5rem 1.5rem; cursor: pointer; transition: border-color 0.2s, color 0.2s; }
+    .pay-success-close:hover { border-color: var(--accent); color: var(--accent); }
+    .support-why { padding: 4rem 8%; border-bottom: 1px solid #1e1e1e; display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; }
+    .support-why-text h2 { font-size: 1.8rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 1.5rem; }
+    .support-why-text p { font-size: 0.88rem; line-height: 1.9; color: var(--text-muted); font-family: Georgia, serif; margin-bottom: 1.2rem; }
+    .use-of-funds h3 { font-size: 0.65rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--accent); margin-bottom: 1.5rem; }
+    .fund-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+    .fund-bar-wrap { flex: 1; height: 3px; background: #1e1e1e; border-radius: 999px; overflow: hidden; }
+    .fund-bar { height: 100%; background: var(--accent); border-radius: 999px; }
+    .fund-label { font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); width: 160px; flex-shrink: 0; }
+    .fund-pct { font-size: 0.65rem; font-weight: 700; color: var(--text-white); width: 36px; text-align: right; flex-shrink: 0; }
+    .support-faq { padding: 4rem 8%; border-bottom: 1px solid #1e1e1e; }
+    .support-faq h2 { font-size: 0.65rem; letter-spacing: 0.35em; text-transform: uppercase; color: var(--accent); margin-bottom: 2.5rem; }
+    .faq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+    .faq-item h3 { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.6rem; color: var(--text-white); }
+    .faq-item p { font-size: 0.8rem; line-height: 1.75; color: var(--text-muted); font-family: Georgia, serif; }
+    .support-legal { padding: 2rem 8%; border-bottom: 1px solid #1e1e1e; display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap; }
+    .support-legal span { font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase; color: #444; }
+    .support-legal a { font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase; color: #666; cursor: pointer; text-decoration: underline; transition: color 0.2s; }
+    .support-legal a:hover { color: var(--accent); }
     @media (max-width: 768px) {
-      /* Nav */
-      nav { padding: 1rem 1.2rem; }
-      .logo {
-        font-size: 1rem;
-        margin-left: 0;
-        letter-spacing: 0.15em;
-        /* fix vertical writing — ensure horizontal */
-        writing-mode: horizontal-tb;
-        text-orientation: mixed;
-      }
-      .nav-links-inline { padding-right: 1rem; gap: 1.2rem; }
-      .nav-links-inline a { font-size: 0.6rem; }
+      /* ── NAV: hide desktop links, show hamburger & mobile panel ── */
+      .nav-links-inline { display: none !important; }
+      .mobile-menu-panel { display: flex; }
+      .mobile-menu-backdrop { display: block; }
+      nav { padding: 1rem 1.4rem; }
+      .logo { font-size: 1rem; margin-left: 0; letter-spacing: 0.18em; }
 
-      /* Hero text — center it on mobile */
-      .hero-text {
-        bottom: 12%;
-        right: auto;
-        left: 50%;
-        transform: translateX(-50%);
-        text-align: center;
-        width: 85%;
-      }
+      /* ── HERO ── */
+      .hero-text { top: 6rem !important; bottom: auto !important; right: auto !important; left: 50% !important; transform: translateX(-50%) !important; text-align: center !important; width: 88%; }
       .hero-text p { max-width: 100%; }
+      .img-desktop { display: none !important; }
+      .img-mobile  { display: block !important; }
+      .img-mobile  { width: 200px !important; left: 0 !important; bottom: 0 !important; }
+      .satellite-img { width: 250px !important; left: 150px !important; bottom: 130px !important; }
+      .rocket-hero-wrap { width: 100% !important; bottom: 0 !important; left: 0 !important; }
 
-      /* Rocket — smaller, don't overflow */
-      .rocket-hero-wrap { width: 220px; }
-      .satellite-img { width: 160px; left: 160px; bottom: 120px; }
+      /* ── OVERLAP SLIDES ── */
+      .overlap-slide { flex-direction: column; }
+      .slide-left { padding: 5rem 6% 3rem; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.06); }
+      .slide-title { font-size: 3rem; }
+      .slide-desc { max-width: 100%; }
+      .slide-right { padding: 3rem 6% 5rem; }
 
-      /* Other pages */
-      .projects-hero { flex-direction: column; padding: 3rem 1.5rem; gap: 3rem; }
-      .rocket-wrap { width: 130px; align-self: flex-end; }
-      .projects-specs { grid-template-columns: 1fr; }
+      /* ── PROJECTS ── */
+      .proj-speck { grid-template-columns: 1fr; }
+      .proj-speck-info { border-right: none; border-bottom: 1px solid var(--proj-border); }
+      .fullscale-grid { grid-template-columns: 1fr 1fr; }
+      .fullscale-two-col { grid-template-columns: 1fr; }
+
+      /* ── ABOUT ── */
       .about-body { grid-template-columns: 1fr; }
       .values-grid { grid-template-columns: 1fr 1fr; }
+
+      /* ── CONTACT ── */
       .contact-body { grid-template-columns: 1fr; }
       .contact-info { border-right: none; border-bottom: 1px solid #1a1a1a; }
+
+      /* ── FOOTER ── */
+      footer { grid-template-columns: 1fr; gap: 1.5rem; }
+      .footer-right { justify-content: flex-start; }
+      .footer-center { align-items: flex-start; }
+
+      /* ── SUPPORT ── */
+      .payment-grid { grid-template-columns: 1fr; }
+      .rewards-tiers-grid { grid-template-columns: 1fr; }
+      .support-why { grid-template-columns: 1fr; gap: 3rem; }
+      .faq-grid { grid-template-columns: 1fr; }
+      .support-hero .hero-stats { gap: 2rem; }
     }
-    @media (max-width: 480px) {
-      .hero-text h1 { font-size: 1.4rem; }
-      .hero-text p { font-size: 0.55rem; }
-      .rocket-hero-wrap { width: 160px; }
-      .satellite-img { width: 120px; left: 110px; bottom: 90px; }
-      .product-info h2 { font-size: 2rem; }
-      .about-header h1, .contact-header h1 { font-size: 2.2rem; }
-      .values-grid { grid-template-columns: 1fr; }
-      .prototype-inner h2 { font-size: 2.5rem; }
-    }
-    /* ─── PROTOTYPE SECTION — slides over the sticky hero ─── */
-    .prototype-section {
-      position: relative;
-      z-index: 2;
-      min-height: 100vh;
-      box-shadow: 0 -24px 60px rgba(0,0,0,0.8);
-      background:
-        radial-gradient(ellipse at 20% 50%, #1a1228 0%, transparent 60%),
-        radial-gradient(ellipse at 80% 20%, #0d1a2e 0%, transparent 55%),
-        linear-gradient(180deg, #050810 0%, #0a0d18 50%, #080b15 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      overflow: hidden;
-      padding: 6rem 8%;
-    }
-    /* subtle grid overlay */
-    .prototype-section::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
-      background-size: 60px 60px;
-      pointer-events: none;
-    }
-    .prototype-inner {
-      position: relative;
-      z-index: 1;
-      text-align: center;
-      max-width: 700px;
-    }
-    .prototype-tag {
-      font-size: 0.6rem;
-      letter-spacing: 0.35em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 1.5rem;
-      display: block;
-    }
-    .prototype-inner h2 {
-      font-size: 4rem;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      line-height: 1;
-      margin-bottom: 1.5rem;
-      /* ghost outline style */
-      color: transparent;
-      -webkit-text-stroke: 1px rgba(245,245,245,0.6);
-    }
-    .prototype-inner h2 span {
-      color: var(--text-white);
-      -webkit-text-stroke: 0;
-    }
-    .prototype-inner p {
-      font-size: 0.8rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      line-height: 1.9;
-      margin-bottom: 2.5rem;
-    }
-    .prototype-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.6rem;
-      padding: 0.5rem 1.2rem;
-      border: 1px solid rgba(192, 83, 42, 0.4);
-      border-radius: 999px;
-      font-size: 0.6rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--accent);
-    }
-    .prototype-badge::before {
-      content: '';
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--accent);
-      animation: blink 1.4s ease-in-out infinite;
-    }
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50%       { opacity: 0.2; }
-    }
-    /* corner decorators */
-    .proto-corner {
-      position: absolute;
-      width: 40px;
-      height: 40px;
-      opacity: 0.25;
-    }
-    .proto-corner.tl { top: 3rem; left: 3rem; border-top: 1px solid #fff; border-left: 1px solid #fff; }
-    .proto-corner.tr { top: 3rem; right: 3rem; border-top: 1px solid #fff; border-right: 1px solid #fff; }
-    .proto-corner.bl { bottom: 3rem; left: 3rem; border-bottom: 1px solid #fff; border-left: 1px solid #fff; }
-    .proto-corner.br { bottom: 3rem; right: 3rem; border-bottom: 1px solid #fff; border-right: 1px solid #fff; }
 
     @media (max-width: 480px) {
-      .prototype-inner h2 { font-size: 2.5rem; }
+      .hero-text h1 { font-size: 1.4rem; }
+      .hero-text p  { font-size: 0.55rem; }
+      .img-mobile { width: 330px !important; left: -20px !important; bottom: 210px !important; }
+      .satellite-img { width: 230px !important; left: 170px !important; bottom: 330px !important; }
+      .slide-title { font-size: 2.4rem; }
+      .fullscale-grid { grid-template-columns: 1fr; }
+      .values-grid { grid-template-columns: 1fr; }
+      .about-header h1, .contact-header h1 { font-size: 2.2rem; }
     }
+
+    /* ─── LEGAL MODALS ─── */
+    .legal-modal-overlay {
+      display: none; position: fixed; inset: 0; z-index: 500;
+      background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      align-items: center; justify-content: center; padding: 1.5rem;
+    }
+    .legal-modal-overlay.open { display: flex; }
+    .legal-modal {
+      background: #0c0c10; border: 1px solid #2a2a2a; border-radius: 12px;
+      max-width: 620px; width: 100%; max-height: 78vh; overflow-y: auto;
+      padding: 2.5rem; position: relative;
+    }
+    .legal-modal::-webkit-scrollbar { width: 4px; }
+    .legal-modal::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 999px; }
+    .legal-modal h2 { font-size: 1rem; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 0.3rem; color: var(--text-white); }
+    .legal-modal .modal-tag { font-size: 0.58rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--accent); margin-bottom: 1.8rem; display: block; }
+    .legal-modal h3 { font-size: 0.68rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-white); margin-top: 1.8rem; margin-bottom: 0.7rem; padding-bottom: 0.4rem; border-bottom: 1px solid #1e1e1e; }
+    .legal-modal p { font-size: 0.82rem; line-height: 1.9; color: var(--text-muted); font-family: Georgia, serif; margin-bottom: 0.8rem; }
+    .legal-modal ul { margin: 0.4rem 0 0.8rem 1.2rem; }
+    .legal-modal ul li { font-size: 0.82rem; line-height: 1.8; color: var(--text-muted); font-family: Georgia, serif; margin-bottom: 0.3rem; }
+    .legal-modal strong { color: var(--text-white); }
+    .legal-modal-close {
+      position: absolute; top: 1.2rem; right: 1.2rem;
+      background: #1a1a1e; border: 1px solid #2a2a2a; color: #888;
+      font-size: 0.75rem; cursor: pointer; transition: color 0.2s, border-color 0.2s, background 0.2s;
+      font-family: "Courier New", Courier, monospace; border-radius: 5px;
+      padding: 0.3rem 0.8rem; letter-spacing: 0.1em;
+    }
+    .legal-modal-close:hover { color: var(--text-white); border-color: #555; background: #222; }
+
   </style>
 </head>
 <body>
 
-<!-- NAV -->
 <nav>
-  <span class="logo" onclick="showPage('home')">v e l o c i t y</span>
-
+  <span class="logo" onclick="showPage('home')">Q U N I X</span>
   <div class="nav-links-inline" id="navLinks">
-    <a onclick="navigate('projects')">Projects</a>
-    <a onclick="navigate('about')">About Us</a>
-    <a onclick="navigate('contact')">Contact</a>
+    <a data-page="projects" onclick="navigate('projects')">Projects</a>
+    <a data-page="about" onclick="navigate('about')">About Us</a>
+    <a data-page="support" onclick="navigate('support')">Support Us</a>
+    <a href="https://store.qunixspace.com" target="_blank" rel="noopener">Store ↗</a>
+    <a data-page="contact" onclick="navigate('contact')">Contact</a>
   </div>
-
   <button class="hamburger" id="menuBtn" onclick="toggleMenu()" aria-label="Menu">
-    <span></span>
-    <span></span>
-    <span></span>
+    <span></span><span></span><span></span>
   </button>
 </nav>
 
-<!-- ═══════════════ HOME PAGE ═══════════════ -->
-<div class="page active" id="page-home">
-  <section class="hero" id="hero">
-    <div class="hero-blur-overlay" id="heroBlur"></div>
-    <div class="rocket-hero-wrap">
-      <img src="rocket.png" alt="Rocket">
-      <img src="satellite.png" alt="Satellite" class="satellite-img">
-    </div>
-    <div class="hero-text">
-      <h1>Live Soon</h1>
-      <p>Domain is under development by our IT team. For any query reach us at our contact page!</p>
-      <button class="btn-outline" onclick="showPage('contact')">Contact Us</button>
-    </div>
-    <button class="scroll-arrow" onclick="document.getElementById('proto-section').scrollIntoView({behavior:'smooth'})" aria-label="View Projects">&#8964;</button>
-  </section>
-
-  <!-- PROTOTYPE SECTION -->
-  <section class="prototype-section" id="proto-section">
-    <div class="proto-corner tl"></div>
-    <div class="proto-corner tr"></div>
-    <div class="proto-corner bl"></div>
-    <div class="proto-corner br"></div>
-    <div class="prototype-inner">
-      <span class="prototype-tag">Current Build</span>
-      <h2><span>Prototype</span><br>Name not Here</h2>
-      <p>Placeholder — details coming soon.</p>
-      <div class="prototype-badge">In Development</div>
-    </div>
-  </section>
-
-  <footer>
-    <span>© 2026 velocity</span>
-    <span>All rights reserved</span>
-  </footer>
+<div class="mobile-menu-backdrop" id="mobileBackdrop" onclick="closeMobileMenu()"></div>
+<div class="mobile-menu-panel" id="mobilePanel">
+  <a onclick="navigate('projects')">Projects</a>
+  <a onclick="navigate('about')">About Us</a>
+  <a onclick="navigate('support')">Support Us</a>
+  <a onclick="navigate('contact')">Contact</a>
+  <a href="https://store.qunixspace.com" target="_blank" rel="noopener">Store ↗</a>
 </div>
 
-<!-- ═══════════════ PROJECTS PAGE ═══════════════ -->
-<div class="page" id="page-projects">
-  <div class="projects-page">
-    <div class="projects-hero">
-      <div class="product-info">
-        <h2>Speck</h2>
-        <p class="subtitle">A Reusable &ndash; (SLV)</p>
-        <p class="desc">Experience next-generation space travel with our semi 3D printed reusable rocket. Designed for efficiency, sustainability, and repeated launches without compromise.</p>
-        <button class="btn-outline" onclick="showPage('about')">Learn More</button>
-      </div>
-      <div class="rocket-wrap">
-        <img src="rocket.png" alt="Speck Rocket" onerror="this.style.display='none'">
-        <div class="rocket-placeholder" id="rocketPlaceholder">rocket.png</div>
-      </div>
-    </div>
-    <div class="projects-specs">
-      <div class="spec-card">
-        <h3>Design</h3>
-        <p>Semi 3D-printed airframe optimized for aerodynamic efficiency and minimal turnaround time between launches.</p>
-      </div>
-      <div class="spec-card">
-        <h3>Reusability</h3>
-        <p>Core structural components recovered and refurbished, dramatically reducing per-launch cost over expendable systems.</p>
-      </div>
-      <div class="spec-card">
-        <h3>Mission</h3>
-        <p>Small payload delivery to low Earth orbit, with a roadmap to medium-lift capacity by 2028.</p>
-      </div>
-    </div>
-    <footer>
-      <span>© 2026 velocity</span>
-      <span>All rights reserved</span>
-    </footer>
+<!-- LEGAL MODALS -->
+<div class="legal-modal-overlay" id="modalPrivacy">
+  <div class="legal-modal">
+    <button class="legal-modal-close" onclick="closeLegal('modalPrivacy')">&#x2715; Close</button>
+    <h2>Privacy Policy</h2>
+    <span class="modal-tag">Effective January 2026 · Crowdfunding & General Use</span>
+    <p>QUNIX ("we", "us", or "our") is committed to protecting the privacy of all visitors and backers. This policy explains how we collect, use, store, and protect your personal information when you visit our website or make a contribution through our crowdfunding programme.</p>
+    <h3>Information We Collect</h3>
+    <p>When you make a contribution or submit an enquiry, we may collect: your full name, email address, postal address (where required for physical rewards), and payment information. Payment data is processed exclusively through our third-party payment processor and is never stored on QUNIX servers.</p>
+    <h3>How We Use Your Information</h3>
+    <ul>
+      <li>To process your contribution and issue confirmation receipts.</li>
+      <li>To communicate updates on the campaign, project milestones, and reward fulfilment.</li>
+      <li>To deliver physical or digital rewards to eligible backers.</li>
+      <li>To respond to enquiries submitted through our contact form.</li>
+      <li>To comply with applicable legal and financial record-keeping obligations.</li>
+    </ul>
+    <h3>Data Sharing</h3>
+    <p>We do not sell, trade, or share your personal data with third parties for marketing purposes. Data may be shared only with: our payment processor (for transaction fulfilment), logistics partners (for physical reward delivery), and regulatory authorities where legally required.</p>
+    <h3>Data Retention</h3>
+    <p>Backer data is retained for a minimum of seven years to comply with financial and tax reporting obligations. You may request deletion of non-statutory data at any time by contacting us.</p>
+    <h3>Cookies</h3>
+    <p>Our website does not use tracking or advertising cookies. We may use essential session cookies solely for website functionality.</p>
+    <h3>Your Rights</h3>
+    <p>You have the right to access, correct, or request deletion of personal data we hold. To exercise these rights, contact us at <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="87efe2ebebe8c7f6f2e9eefff4f7e6e4e2a9e4e8ea">[email&#160;protected]</a>. We will respond within 30 days.</p>
+    <h3>Changes to This Policy</h3>
+    <p>We may update this policy as our operations evolve. Material changes will be communicated by email to registered backers. Continued use of the site constitutes acceptance.</p>
   </div>
 </div>
 
-<!-- ═══════════════ ABOUT PAGE ═══════════════ -->
+<div class="legal-modal-overlay" id="modalTerms">
+  <div class="legal-modal">
+    <button class="legal-modal-close" onclick="closeLegal('modalTerms')">&#x2715; Close</button>
+    <h2>Terms & Conditions</h2>
+    <span class="modal-tag">Crowdfunding Programme · QUNIX · January 2026</span>
+    <p>By making a contribution to QUNIX through this platform, you agree to the following terms. Please read them carefully before proceeding.</p>
+    <h3>1. Nature of Crowdfunding Contributions</h3>
+    <p>Contributions made to QUNIX are voluntary financial support for a speculative aerospace development programme. Crowdfunding contributions are <strong style="color:var(--text-white)">not equity investments</strong> and do not confer ownership, shares, voting rights, or any financial return. Contributors are supporters of the mission, not shareholders or creditors.</p>
+    <h3>2. Use of Funds</h3>
+    <p>Funds raised through this campaign will be allocated as follows:</p>
+    <ul>
+      <li><strong style="color:var(--text-white)">45% — Propulsion & Engine Development:</strong> Component procurement, test equipment, materials, and static fire infrastructure.</li>
+      <li><strong style="color:var(--text-white)">25% — Airframe Manufacturing:</strong> 3D printing consumables, structural materials, tooling, and assembly.</li>
+      <li><strong style="color:var(--text-white)">15% — Avionics & Software:</strong> Flight computer hardware, sensors, GNC software development, and integration testing.</li>
+      <li><strong style="color:var(--text-white)">10% — Operations & Facilities:</strong> Test site access, regulatory filings, safety equipment, and team operations.</li>
+      <li><strong style="color:var(--text-white)">5% — Rewards Fulfilment:</strong> Production and shipping of backer rewards and certificates.</li>
+    </ul>
+    <h3>3. Risks & Disclaimers</h3>
+    <p>Aerospace development involves significant technical, regulatory, and financial risk. Timelines and milestones described on this website are targets, not guarantees. QUNIX does not guarantee mission success, specific performance outcomes, or adherence to any stated schedule. By contributing, you acknowledge and accept these risks.</p>
+    <h3>4. Rewards</h3>
+    <p>Where rewards are offered, QUNIX will make reasonable efforts to fulfil them within the timeframes stated. Reward delivery may be delayed due to technical or logistical factors beyond our control. Physical rewards will only be shipped to addresses within serviceable regions.</p>
+    <h3>5. Intellectual Property</h3>
+    <p>All QUNIX designs, documents, branding, and technical data remain the exclusive intellectual property of QUNIX. Contributions do not grant any licence to use, reproduce, or commercialise QUNIX intellectual property.</p>
+    <h3>6. Governing Law</h3>
+    <p>These terms are governed by applicable law in the jurisdiction in which QUNIX is registered. Any disputes arising from contributions shall be subject to the exclusive jurisdiction of the courts of that territory.</p>
+    <h3>7. Contact</h3>
+    <p>For questions regarding these terms, contact us at <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="9bf3fef7f7f4dbeaeef5f2e3e8ebfaf8feb5f8f4f6">[email&#160;protected]</a>.</p>
+  </div>
+</div>
+
+<div class="legal-modal-overlay" id="modalRefund">
+  <div class="legal-modal">
+    <button class="legal-modal-close" onclick="closeLegal('modalRefund')">&#x2715; Close</button>
+    <h2>Refund & Return Policy</h2>
+    <span class="modal-tag">Crowdfunding Contributions · QUNIX · January 2026</span>
+    <p>QUNIX is grateful for the support of every backer. This policy outlines the circumstances under which contributions may be refunded and the process for requesting a refund.</p>
+    <h3>Contributions Are Generally Non-Refundable</h3>
+    <p>Because crowdfunding contributions are committed to ongoing development costs from the time of receipt, all contributions are considered final and <strong style="color:var(--text-white)">non-refundable</strong> except in the specific circumstances outlined below.</p>
+    <h3>Refund Eligibility</h3>
+    <ul>
+      <li><strong style="color:var(--text-white)">Campaign Cancellation:</strong> If QUNIX officially cancels the crowdfunding campaign before its stated closing date, all contributions received will be refunded in full.</li>
+      <li><strong style="color:var(--text-white)">Duplicate Transactions:</strong> If a technical error results in a duplicate charge, the duplicate amount will be refunded upon verification.</li>
+      <li><strong style="color:var(--text-white)">Fraudulent Transactions:</strong> If a contribution is made fraudulently without the account holder's authorisation, a full refund will be issued upon investigation.</li>
+      <li><strong style="color:var(--text-white)">Unreceived Physical Rewards:</strong> If a physical reward has not been received within 90 days of the stated dispatch date, backers may request a replacement or partial refund of the reward component of their contribution.</li>
+    </ul>
+    <h3>Excluded Circumstances</h3>
+    <p>Refunds will not be issued on the basis of: project timeline delays, changes to vehicle specifications, failure to achieve specific technical milestones, or personal change of mind after contribution.</p>
+    <h3>How to Request a Refund</h3>
+    <p>Email <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="274f424b4b48675652494e5f54574644420944484a">[email&#160;protected]</a> with your full name, the email address used at contribution, your contribution amount, and the reason for your request. We will acknowledge within 5 business days and resolve eligible claims within 30 days.</p>
+    <h3>Processing</h3>
+    <p>Approved refunds will be returned to the original payment method. Processing times are typically 5–10 business days after approval.</p>
+  </div>
+</div>
+
+<!-- ═══ HOME PAGE ═══ -->
+<div class="page active" id="page-home">
+  <div class="home-scroll-wrap">
+    <section class="hero" id="hero">
+      <div class="hero-blur-overlay" id="heroBlur"></div>
+      <div class="rocket-hero-wrap">
+        <img src="rocket.webp" alt="Rocket" class="img-desktop">
+        <img src="rocket-mobile.png" alt="Rocket" class="img-mobile">
+        <img src="satellite.png" alt="Satellite" class="satellite-img">
+      </div>
+      <div class="hero-text">
+        <h1>Live Soon</h1>
+        <p>Domain is under development by our IT team, meanwhile for any queries reach us at our contact page!</p>
+        <button class="btn-outline" onclick="navigate('contact')">Contact Us</button>
+      </div>
+      <button class="scroll-arrow" onclick="document.getElementById('slide-speck1').scrollIntoView({behavior:'smooth'})" aria-label="Scroll">&#8964;</button>
+    </section>
+
+    <section class="overlap-slide slide-speck1" id="slide-speck1">
+      <div class="proto-corner tl"></div><div class="proto-corner tr"></div>
+      <div class="proto-corner bl"></div><div class="proto-corner br"></div>
+      <div class="slide-left">
+        <span class="slide-eyebrow">Prototype · 2026</span>
+        <h2 class="slide-title"><span>Speck</span></h2>
+        <div class="slide-divider"></div>
+        <p class="slide-desc">A reusable launch vehicle demonstrator engineered to validate propulsive reusability and vertical takeoff, vertical landing (VTVL) flight methods. Speck serves as the foundational test platform for QUNIX's next-generation launch architecture, enabling low-cost iterative development before full-scale deployment.</p>
+        <div class="slide-badge">In Development</div>
+        <button class="btn-slide" onclick="navigate('projects')">Learn More</button>
+      </div>
+      <div class="slide-right">
+        <div class="slide-img-wrap">
+          <img src="speck.png" alt="Speck Prototype" onerror="this.style.display='none'; document.getElementById('speckPh1').style.display='flex'">
+          <div class="slide-img-placeholder" id="speckPh1" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9l4-4 4 4 4-6 4 6"/></svg>speck.png</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="overlap-slide slide-speck2" id="slide-speck2">
+      <div class="proto-corner tl"></div><div class="proto-corner tr"></div>
+      <div class="proto-corner bl"></div><div class="proto-corner br"></div>
+      <div class="slide-left">
+        <span class="slide-eyebrow">Full Scale · In Design</span>
+        <h2 class="slide-title"><span>Speck</span> 2</h2>
+        <div class="slide-divider"></div>
+        <p class="slide-desc">Speck 2 is QUNIX's full-scale reusable launch vehicle designed for operational payload delivery to low Earth orbit. Building directly on lessons validated through the Speck demonstrator programme, Speck 2 targets a fully reusable first stage with rapid ground turnaround, significantly reducing cost-per-kilogram to orbit compared to conventional expendable systems.</p>
+        <div class="slide-badge">Concept Phase</div>
+        <button class="btn-slide" onclick="navigate('projects')">Learn More</button>
+      </div>
+      <div class="slide-right">
+        <div class="slide-img-wrap">
+          <img src="speck2.png" alt="Speck 2" onerror="this.style.display='none'; document.getElementById('speckPh2').style.display='flex'">
+          <div class="slide-img-placeholder" id="speckPh2" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9l4-4 4 4 4-6 4 6"/></svg>speck2.png</div>
+        </div>
+      </div>
+    </section>
+  </div><!-- end home-scroll-wrap -->
+
+  <footer>
+    <div class="footer-left"><span class="footer-copy">© 2026 QUNIX. All rights reserved.</span><span class="footer-privacy">By using this site you agree to our <a onclick="openLegal('modalPrivacy')">Privacy Policy</a>. QUNIX is committed to protecting your data and maintaining transparency.</span></div>
+    <div class="footer-center"><div class="footer-nav"><a onclick="navigate('home')">Home</a><a onclick="navigate('about')">About</a><a onclick="navigate('projects')">Projects</a><a onclick="navigate('support')">Support</a><a onclick="navigate('contact')">Contact</a></div></div>
+    <div class="footer-right"><div class="footer-socials"><a href="#" title="Instagram"><svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg></a><a href="#" title="LinkedIn"><svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a><a href="#" title="Twitter / X"><svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a><a href="#" title="YouTube"><svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a></div></div>
+  </footer>
+</div>
+
+<!-- ═══ PROJECTS PAGE ═══ -->
+<div class="page" id="page-projects">
+  <div class="projects-page">
+    <div class="proj-header"><h1>Projects</h1><p class="tag">Our Launch Vehicle Programme</p></div>
+    <div class="proj-speck">
+      <div class="proj-speck-info">
+        <span class="section-label">Prototype Demonstrator · SLV</span>
+        <h2>Speck</h2>
+        <p class="vehicle-type">Semi-Reusable Launch Vehicle Demonstrator</p>
+        <p>Speck is a small-scale reusable launch vehicle demonstrator developed to validate core technologies required for propulsive vertical landing and rapid vehicle reuse. The programme focuses on iterative flight testing of guidance, navigation, and control systems; propulsion performance; and structural reusability under repeated flight loads.</p>
+        <div class="spec-grid">
+          <div class="spec-item"><div class="spec-label">Height</div><div class="spec-val">— <span class="spec-unit">m</span></div></div>
+          <div class="spec-item"><div class="spec-label">Diameter</div><div class="spec-val">— <span class="spec-unit">m</span></div></div>
+          <div class="spec-item"><div class="spec-label">Gross Mass</div><div class="spec-val">— <span class="spec-unit">kg</span></div></div>
+          <div class="spec-item"><div class="spec-label">Propellant</div><div class="spec-val" style="font-size:0.8rem">— / —</div></div>
+          <div class="spec-item"><div class="spec-label">Max Thrust</div><div class="spec-val">— <span class="spec-unit">kN</span></div></div>
+          <div class="spec-item"><div class="spec-label">Flight Profile</div><div class="spec-val" style="font-size:0.75rem">VTVL</div></div>
+        </div>
+        <button class="btn-outline" onclick="navigate('contact')" style="border-color:var(--proj-accent);color:var(--proj-accent)" onmouseover="this.style.background='var(--proj-accent)';this.style.color='#000'" onmouseout="this.style.background='none';this.style.color='var(--proj-accent)'">Get In Touch</button>
+      </div>
+      <div class="proj-speck-image">
+        <img src="speck.png" alt="Speck" onerror="this.style.display='none'; document.getElementById('projSpeckPh').style.display='flex'">
+        <div class="proj-img-placeholder" id="projSpeckPh" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" width="32" height="32"><line x1="12" y1="2" x2="12" y2="22"/><path d="M5 8l7-6 7 6"/><path d="M5 16l7 6 7-6"/></svg>speck.png</div>
+      </div>
+    </div>
+    <div class="proj-timeline">
+      <h2>Development Roadmap</h2>
+      <div class="timeline-track">
+        <div class="timeline-item done"><div class="timeline-dot"></div><div class="timeline-date">Phase 01 · 2024</div><div class="timeline-title">Concept Design & Feasibility</div><div class="timeline-desc">Initial vehicle sizing, propulsion trade studies, and mission architecture definition.</div><span class="timeline-tag done-tag">Completed</span></div>
+        <div class="timeline-item done"><div class="timeline-dot"></div><div class="timeline-date">Phase 02 · 2025</div><div class="timeline-title">Engine Development & Bench Testing</div><div class="timeline-desc">Design and fabrication of the primary propulsion unit. Cold-flow testing, ignition trials, and thrust characterisation.</div><span class="timeline-tag done-tag">Completed</span></div>
+        <div class="timeline-item active-phase"><div class="timeline-dot"></div><div class="timeline-date">Phase 03 · 2026 — Current</div><div class="timeline-title">Full Prototype Manufacturing & Ground Test</div><div class="timeline-desc">Assembly of complete flight vehicle. Static fire testing of integrated propulsion system. Avionics integration and GNC software validation.</div><span class="timeline-tag wip-tag">In Progress</span></div>
+        <div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-date">Phase 04 · 2026 – 2027</div><div class="timeline-title">Hop Testing & Low-Altitude VTVL Flights</div><div class="timeline-desc">Tethered hover tests followed by free-flight low-altitude hop campaigns.</div><span class="timeline-tag planned-tag">Planned</span></div>
+        <div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-date">Phase 05 · 2027</div><div class="timeline-title">High-Altitude Flight & Recovery Demonstration</div><div class="timeline-desc">Full mission profile flight to target apogee followed by propulsive return-to-launch-site manoeuvre and precision vertical landing.</div><span class="timeline-tag planned-tag">Planned</span></div>
+        <div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-date">Phase 06 · 2027 – 2028</div><div class="timeline-title">Speck 2 — Full Scale Design Lock</div><div class="timeline-desc">Translation of Speck lessons into full-scale orbital vehicle design. Engine upscaling programme begins.</div><span class="timeline-tag planned-tag">Planned</span></div>
+      </div>
+    </div>
+    <div class="proj-fullscale">
+      <div class="proj-fullscale-header">
+        <span class="section-label">Full-Scale Orbital Vehicle · Concept Phase</span>
+        <h2>Speck 2</h2>
+        <p>Speck 2 is the next-generation orbital launch vehicle currently in conceptual design. Designed as a fully reusable two-stage system, it targets delivery of commercial and government payloads to low Earth orbit. The following performance targets are preliminary and subject to revision as the design matures.</p>
+      </div>
+      <div class="fullscale-grid">
+        <div class="fs-card"><div class="fs-card-label">Target Payload to LEO</div><div class="fs-card-value">—</div><div class="fs-card-unit">kg (expendable)</div><div class="fs-card-note">Reusable mode target: — kg at — km circular orbit</div></div>
+        <div class="fs-card"><div class="fs-card-label">First Stage Max Thrust</div><div class="fs-card-value">—</div><div class="fs-card-unit">kN (sea level)</div><div class="fs-card-note">Engine cluster configuration under evaluation</div></div>
+        <div class="fs-card"><div class="fs-card-label">Target Orbit</div><div class="fs-card-value">—</div><div class="fs-card-unit">km LEO</div><div class="fs-card-note">SSO and ISS-inclination orbits in scope</div></div>
+        <div class="fs-card"><div class="fs-card-label">Vehicle Height</div><div class="fs-card-value">—</div><div class="fs-card-unit">m (two stages)</div><div class="fs-card-note">Fairing diameter: — m</div></div>
+        <div class="fs-card"><div class="fs-card-label">Gross Lift-off Mass</div><div class="fs-card-value">—</div><div class="fs-card-unit">tonnes</div><div class="fs-card-note">Propellant mass fraction target: —%</div></div>
+        <div class="fs-card"><div class="fs-card-label">Target Launch Cadence</div><div class="fs-card-value">—</div><div class="fs-card-unit">flights/year</div><div class="fs-card-note">Stage turnaround target: — days</div></div>
+      </div>
+      <div class="fullscale-two-col">
+        <div class="fs-col">
+          <h3>First Stage · Propulsion</h3>
+          <div class="fs-row"><span class="fs-row-label">Engine designation</span><span class="fs-row-val">—</span></div>
+          <div class="fs-row"><span class="fs-row-label">Propellant combination</span><span class="fs-row-val">— / —</span></div>
+          <div class="fs-row"><span class="fs-row-label">Chamber pressure</span><span class="fs-row-val">— bar</span></div>
+          <div class="fs-row"><span class="fs-row-label">Specific impulse (vac)</span><span class="fs-row-val">— s</span></div>
+          <div class="fs-row"><span class="fs-row-label">Throttle range</span><span class="fs-row-val">— – 100%</span></div>
+          <div class="fs-row"><span class="fs-row-label">Recovery method</span><span class="fs-row-val">Propulsive RTLS</span></div>
+        </div>
+        <div class="fs-col">
+          <h3>Second Stage · Performance</h3>
+          <div class="fs-row"><span class="fs-row-label">Vacuum thrust</span><span class="fs-row-val">— kN</span></div>
+          <div class="fs-row"><span class="fs-row-label">Specific impulse</span><span class="fs-row-val">— s</span></div>
+          <div class="fs-row"><span class="fs-row-label">Fairing volume</span><span class="fs-row-val">— m³</span></div>
+          <div class="fs-row"><span class="fs-row-label">Separation altitude</span><span class="fs-row-val">— km</span></div>
+          <div class="fs-row"><span class="fs-row-label">Payload interface</span><span class="fs-row-val">— mm</span></div>
+          <div class="fs-row"><span class="fs-row-label">Target first flight</span><span class="fs-row-val">TBD</span></div>
+        </div>
+      </div>
+    </div>
+    <footer><div class="footer-left"><span class="footer-copy">© 2026 QUNIX. All rights reserved.</span><span class="footer-privacy">By using this site you agree to our <a onclick="openLegal('modalPrivacy')">Privacy Policy</a>.</span></div><div class="footer-center"><div class="footer-nav"><a onclick="navigate('home')">Home</a><a onclick="navigate('about')">About</a><a onclick="navigate('contact')">Contact</a></div></div><div class="footer-right"><div class="footer-socials"><a href="#" title="Instagram"><svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg></a><a href="#" title="LinkedIn"><svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a><a href="#" title="Twitter / X"><svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a><a href="#" title="YouTube"><svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a></div></div></footer>
+  </div>
+</div>
+
+<!-- ═══ ABOUT PAGE ═══ -->
 <div class="page" id="page-about">
   <div class="about-page">
-    <div class="about-header">
-      <h1>About Us</h1>
-      <p class="tag">Next-Generation Aerospace</p>
-    </div>
+    <div class="about-header"><h1>About Us</h1><p class="tag">Next-Generation Aerospace</p></div>
     <div class="about-body">
-      <div class="about-col">
-        <h2>Who We Are</h2>
-        <p>We are a next-generation aerospace company pushing the boundaries of reusable launch technology. Founded by a team of engineers and visionaries, velocity is committed to making space more accessible, affordable, and sustainable for everyone on Earth.</p>
-      </div>
-      <div class="about-col">
-        <h2>Our Mission</h2>
-        <p>To democratize access to space through innovative, low-cost, reusable launch systems. We believe the next era of space exploration demands vehicles that can fly again and again — without sacrificing reliability or performance.</p>
-      </div>
+      <div class="about-col"><h2>Who We Are</h2><p>We are a next-generation aerospace company pushing the boundaries of reusable launch technology. Founded by a team of engineers and visionaries, QUNIX is committed to making space more accessible, affordable, and sustainable for everyone on Earth.</p></div>
+      <div class="about-col"><h2>Our Mission</h2><p>To democratize access to space through innovative, low-cost, reusable launch systems. We believe the next era of space exploration demands vehicles that can fly again and again — without sacrificing reliability or performance.</p></div>
     </div>
     <div class="about-values">
       <h2>What Drives Us</h2>
       <div class="values-grid">
-        <div class="value-item">
-          <div class="num">01</div>
-          <h3>Innovation</h3>
-          <p>Relentless pursuit of better — in design, manufacturing, and operations.</p>
-        </div>
-        <div class="value-item">
-          <div class="num">02</div>
-          <h3>Sustainability</h3>
-          <p>Reusability at the core. Every component designed to fly again.</p>
-        </div>
-        <div class="value-item">
-          <div class="num">03</div>
-          <h3>Accessibility</h3>
-          <p>Lowering the barrier to orbit for research, commerce, and exploration.</p>
-        </div>
-        <div class="value-item">
-          <div class="num">04</div>
-          <h3>Precision</h3>
-          <p>Zero compromise on engineering standards or mission safety.</p>
-        </div>
+        <div class="value-item"><div class="num">01</div><h3>Innovation</h3><p>Relentless pursuit of better — in design, manufacturing, and operations.</p></div>
+        <div class="value-item"><div class="num">02</div><h3>Sustainability</h3><p>Reusability at the core. Every component designed to fly again.</p></div>
+        <div class="value-item"><div class="num">03</div><h3>Accessibility</h3><p>Lowering the barrier to orbit for research, commerce, and exploration.</p></div>
+        <div class="value-item"><div class="num">04</div><h3>Precision</h3><p>Zero compromise on engineering standards or mission safety.</p></div>
       </div>
     </div>
-    <footer>
-      <span>© 2026 velocity</span>
-      <span>All rights reserved</span>
-    </footer>
+    <footer><div class="footer-left"><span class="footer-copy">© 2026 QUNIX. All rights reserved.</span><span class="footer-privacy">By using this site you agree to our <a onclick="openLegal('modalPrivacy')">Privacy Policy</a>.</span></div><div class="footer-center"><div class="footer-nav"><a onclick="navigate('home')">Home</a><a onclick="navigate('projects')">Projects</a><a onclick="navigate('contact')">Contact</a></div></div><div class="footer-right"><div class="footer-socials"><a href="#" title="Instagram"><svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg></a><a href="#" title="LinkedIn"><svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a><a href="#" title="Twitter / X"><svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a><a href="#" title="YouTube"><svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a></div></div></footer>
   </div>
 </div>
 
-<!-- ═══════════════ CONTACT PAGE ═══════════════ -->
+<!-- ═══ CONTACT PAGE ═══ -->
 <div class="page" id="page-contact">
   <div class="contact-page">
-    <div class="contact-header">
-      <h1>Contact</h1>
-      <p class="tag">Get In Touch</p>
-    </div>
+    <div class="contact-header"><h1>Contact</h1><p class="tag">Get In Touch</p></div>
     <div class="contact-body">
       <div class="contact-info">
         <h2>Reach Us</h2>
-        <div class="contact-detail">
-          <h3>Email</h3>
-          <a href="/cdn-cgi/l/email-protection#5d35383131321d2b3831323e342924732e2d3c3e38"><span class="__cf_email__" data-cfemail="dfb7bab3b3b09fa9bab3b0bcb6aba6f1acafbebcba">[email&#160;protected]</span></a>
-        </div>
-        <div class="contact-detail">
-          <h3>Location</h3>
-          <p>Earth's Surface<br>Launching Beyond</p>
-        </div>
-        <div class="contact-detail">
-          <h3>Response Time</h3>
-          <p>Within 48 hours</p>
+        <div class="contact-detail"><h3>Email</h3><a href="/cdn-cgi/l/email-protection#28404d44444768595d4641505b58494b4d064b4745"><span class="__cf_email__" data-cfemail="8ae2efe6e6e5cafbffe4e3f2f9faebe9efa4e9e5e7">[email&#160;protected]</span></a></div>
+        <div class="contact-detail"><h3>Location</h3><p>Earth's Surface<br>Launching Beyond</p></div>
+        <div class="contact-detail"><h3>Response Time</h3><p>Within 48 hours</p></div>
+        <div class="contact-socials-section">
+          <h3>Follow QUNIX</h3>
+          <div class="contact-social-links">
+            <a href="#" class="contact-social-link"><svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg><span class="social-name">Instagram</span><span class="social-handle">@qunixspace</span></a>
+            <a href="#" class="contact-social-link"><svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg><span class="social-name">LinkedIn</span><span class="social-handle">QUNIX</span></a>
+            <a href="#" class="contact-social-link"><svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg><span class="social-name">Twitter / X</span><span class="social-handle">@qunixspace</span></a>
+            <a href="#" class="contact-social-link"><svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg><span class="social-name">YouTube</span><span class="social-handle">QUNIX Official</span></a>
+          </div>
         </div>
       </div>
+
       <div class="contact-form-side">
         <h2>Send a Message</h2>
+
+        <!--
+        ══════════════════════════════════════════════════════
+        GOOGLE SHEETS — ALREADY CONNECTED
+        URL: AKfycbzR8V3wFpF23CsHSFuz...
+        ──────────────────────────────────────────────────────
+        IMPORTANT: Your Apps Script must read form parameters
+        (not JSON). Make sure your script looks like this:
+
+        function doPost(e) {
+          var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+          sheet.appendRow([
+            new Date().toLocaleString('en-GB'),
+            e.parameter.name    || '',
+            e.parameter.email   || '',
+            e.parameter.message || '',
+            e.parameter.page    || 'contact'
+          ]);
+          return ContentService
+            .createTextOutput('OK')
+            .setMimeType(ContentService.MimeType.TEXT);
+        }
+
+        After updating the script, redeploy as a new version:
+        Deploy → Manage deployments → Edit → New version → Deploy
+        ══════════════════════════════════════════════════════
+        -->
+
         <div class="form-row">
           <label>Name</label>
-          <input type="text" placeholder="Your name">
+          <input type="text" id="contactName" placeholder="Your name">
         </div>
         <div class="form-row">
           <label>Email</label>
-          <input type="email" placeholder="your@email.com">
+          <input type="email" id="contactEmail" placeholder="your@email.com">
         </div>
         <div class="form-row">
           <label>Message</label>
-          <textarea placeholder="Tell us what's on your mind..."></textarea>
+          <textarea id="contactMessage" placeholder="Tell us what's on your mind..."></textarea>
         </div>
-        <button class="btn-send">Send Message</button>
+
+        <button class="btn-send" id="contactSubmit" onclick="submitContactForm()">
+          Send Message
+        </button>
+
+        <div class="form-status" id="formStatus"></div>
       </div>
     </div>
-    <footer>
-      <span>© 2026 velocity</span>
-      <span>All rights reserved</span>
-    </footer>
+    <footer><div class="footer-left"><span class="footer-copy">© 2026 QUNIX. All rights reserved.</span><span class="footer-privacy">By using this site you agree to our <a onclick="openLegal('modalPrivacy')">Privacy Policy</a>.</span></div><div class="footer-center"><div class="footer-nav"><a onclick="navigate('home')">Home</a><a onclick="navigate('about')">About</a><a onclick="navigate('projects')">Projects</a></div></div><div class="footer-right"><div class="footer-socials"><a href="#" title="Instagram"><svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg></a><a href="#" title="LinkedIn"><svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a><a href="#" title="Twitter / X"><svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a><a href="#" title="YouTube"><svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a></div></div></footer>
   </div>
 </div>
 
-<script>
+<!-- ═══ SUPPORT PAGE ═══ -->
+<!-- Payment success modal -->
+<div class="pay-success-overlay" id="paySuccessOverlay">
+  <div class="pay-success-box">
+    <div class="pay-success-icon">🚀</div>
+    <h2>Contribution Received</h2>
+    <p>Thank you for backing the QUNIX mission. Your digital rewards and official joiner letter will be delivered to your email within 48 hours.</p>
+    <div class="pay-ref" id="payRef">REF: —</div>
+    <button class="pay-success-close" onclick="document.getElementById('paySuccessOverlay').classList.remove('open')">Close</button>
+  </div>
+</div>
+
+<div class="page" id="page-support">
+  <div class="support-page">
+
+    <!-- Hero -->
+    <div class="support-hero">
+      <span class="eyebrow">Crowdfunding · Open Now</span>
+      <h1>Back the <span>Mission</span></h1>
+      <p class="hero-desc">QUNIX is building the next generation of reusable launch vehicles. Choose any amount — every contribution directly funds engine development, avionics, and test campaigns.</p>
+      <div class="hero-stats">
+        <div class="stat-item"><span class="stat-val">—</span><span class="stat-label">Backers</span></div>
+        <div class="stat-item"><span class="stat-val">—</span><span class="stat-label">Raised</span></div>
+      </div>
+
+    </div>
+
+    <!-- Payment -->
+    <div class="support-payment">
+      <h2>Make a Contribution</h2>
+      <p class="pay-sub">Enter any amount you wish to contribute. No fixed tiers — every pound counts. Digital rewards unlock based on your contribution level.</p>
+      <div class="payment-grid">
+
+        <!-- Amount + Razorpay -->
+        <div class="amount-panel">
+          <h3>Choose Amount</h3>
+          <div class="preset-amounts">
+            <button class="preset-btn" onclick="selectPreset(this, 500)">₹500</button>
+            <button class="preset-btn" onclick="selectPreset(this, 1000)">₹1,000</button>
+            <button class="preset-btn" onclick="selectPreset(this, 2500)">₹2,500</button>
+            <button class="preset-btn" onclick="selectPreset(this, 5000)">₹5,000</button>
+            <button class="preset-btn" onclick="selectPreset(this, 10000)">₹10,000</button>
+            <button class="preset-btn" onclick="selectPreset(this, 0)">Custom</button>
+          </div>
+          <div class="custom-amount-wrap" id="customWrap">
+            <span class="currency">₹</span>
+            <input type="number" id="customAmtInput" placeholder="Enter amount" min="100" oninput="updateAmountDisplay()" onchange="updateAmountDisplay()">
+          </div>
+          <div class="amount-display">
+            <div class="big-num" id="amountDisplay">₹<span id="amtNum">0</span></div>
+          </div>
+          <div class="rewards-unlock" id="rewardsUnlock">
+            Select an amount to see your digital rewards.
+          </div>
+          <button class="btn-paynow" onclick="startRazorpay()" id="rzpBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+            Pay Now
+          </button>
+
+        </div>
+
+        <!-- UPI QR -->
+        <div class="upi-panel">
+          <h3>UPI / QR Code</h3>
+          <p class="upi-sub">Scan with any UPI app and enter your preferred amount directly.</p>
+          <div class="qr-box">
+            <img id="qrImg" src="" alt="UPI QR Code" style="width:100%;height:100%;object-fit:contain">
+          </div>
+          <div class="upi-id-box" id="upiIdDisplay">qunixspace@upi</div>
+          <button class="btn-copy-upi" onclick="copyUPI()">Copy UPI ID</button>
+          <p class="upi-note">After payment, email your UTR / transaction ID to <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="066e636a6a69467773686f7e75766765632865696b">[email&#160;protected]</a> to receive your digital rewards.</p>
+          <div class="upi-apps">
+            <span class="upi-app-tag">GPay</span>
+            <span class="upi-app-tag">PhonePe</span>
+            <span class="upi-app-tag">Paytm</span>
+            <span class="upi-app-tag">BHIM</span>
+            <span class="upi-app-tag">Any UPI</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Digital Rewards -->
+    <div class="support-rewards">
+      <h2>Digital Rewards</h2>
+      <p class="rewards-intro">All rewards are delivered digitally to your email. No physical items — instant fulfilment, zero waste.</p>
+      <div class="rewards-tiers-grid">
+        <div class="reward-tier-col">
+          <div class="rt-range">Any amount</div>
+          <div class="rt-name">Supporter</div>
+          <ul>
+            <li>Official QUNIX digital joiner letter — personally addressed</li>
+            <li>Digital backer certificate (PDF)</li>
+            <li>Name listed on our online supporters wall</li>
+            <li>Mission progress email updates</li>
+          </ul>
+        </div>
+        <div class="reward-tier-col">
+          <div class="rt-range">₹1,000 +</div>
+          <div class="rt-name">Mission Friend</div>
+          <ul>
+            <li>Everything in Supporter</li>
+            <li>Exclusive development diary — behind-the-scenes updates</li>
+            <li>QUNIX digital mission patch (high-res PNG)</li>
+            <li>Quarterly technical briefing email</li>
+          </ul>
+        </div>
+        <div class="reward-tier-col">
+          <div class="rt-range">₹5,000 +</div>
+          <div class="rt-name">Mission Pioneer</div>
+          <ul>
+            <li>Everything in Mission Friend</li>
+            <li>Name credited in vehicle documentation</li>
+            <li>Exclusive early-access to test flight footage</li>
+            <li>Direct Q&A access with the QUNIX team</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Why support + funds -->
+    <div class="support-why">
+      <div class="support-why-text">
+        <h2>Why Your Support Matters</h2>
+        <p>QUNIX is an independent aerospace company building reusable launch systems from the ground up. We rely on community backing to accelerate our development programme and prove that small teams can reach orbit.</p>
+        <p>Every contribution funds real hardware, real tests, and real progress. We publish transparent milestone updates so every backer knows exactly where their support goes.</p>
+        <p>Space is a long game. With your backing, we close the gap between ambition and altitude.</p>
+      </div>
+      <div class="use-of-funds">
+        <h3>How Your Funds Are Used</h3>
+        <div class="fund-row"><span class="fund-label">Propulsion & Engine</span><div class="fund-bar-wrap"><div class="fund-bar" style="width:45%"></div></div><span class="fund-pct">45%</span></div>
+        <div class="fund-row"><span class="fund-label">Airframe Manufacturing</span><div class="fund-bar-wrap"><div class="fund-bar" style="width:25%"></div></div><span class="fund-pct">25%</span></div>
+        <div class="fund-row"><span class="fund-label">Avionics & Software</span><div class="fund-bar-wrap"><div class="fund-bar" style="width:15%"></div></div><span class="fund-pct">15%</span></div>
+        <div class="fund-row"><span class="fund-label">Operations & Facilities</span><div class="fund-bar-wrap"><div class="fund-bar" style="width:10%"></div></div><span class="fund-pct">10%</span></div>
+        <div class="fund-row"><span class="fund-label">Rewards Fulfilment</span><div class="fund-bar-wrap"><div class="fund-bar" style="width:5%"></div></div><span class="fund-pct">5%</span></div>
+      </div>
+    </div>
+
+    <!-- FAQ -->
+    <div class="support-faq">
+      <h2>Frequently Asked Questions</h2>
+      <div class="faq-grid">
+        <div class="faq-item"><h3>Is this an investment?</h3><p>No. Contributions are voluntary support and do not confer equity, shares, or financial return. See our Terms & Conditions for full details.</p></div>
+        <div class="faq-item"><h3>Can I get a refund?</h3><p>Contributions are generally non-refundable as funds are committed to active development. Refunds are available in limited circumstances — see our Refund Policy.</p></div>
+        <div class="faq-item"><h3>When do I get my digital rewards?</h3><p>For Razorpay payments, rewards are emailed within 48 hours of payment confirmation. For UPI, email your UTR to <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="9ef6fbf2f2f1deefebf0f7e6edeefffdfbb0fdf1f3">[email&#160;protected]</a> to trigger fulfilment.</p></div>
+        <div class="faq-item"><h3>What is the joiner letter?</h3><p>An official, personally addressed digital letter from QUNIX welcoming you as a mission backer — suitable for saving or printing.</p></div>
+        <div class="faq-item"><h3>Is my payment secure?</h3><p>Yes. Razorpay is PCI-DSS compliant. QUNIX never stores your card or UPI details.</p></div>
+        <div class="faq-item"><h3>What currency can I pay in?</h3><p>Razorpay accepts INR. For international contributions, please use the contact page and we will arrange an alternative.</p></div>
+      </div>
+    </div>
+
+    <div class="support-legal">
+      <span>Legal:</span>
+      <a onclick="openLegal('modalPrivacy')">Privacy Policy</a>
+      <a onclick="openLegal('modalTerms')">Terms & Conditions</a>
+      <a onclick="openLegal('modalRefund')">Refund Policy</a>
+    </div>
+
+    <footer><div class="footer-left"><span class="footer-copy">© 2026 QUNIX. All rights reserved.</span><span class="footer-privacy">Contributions are not investments. By contributing you agree to our <a onclick="openLegal('modalTerms')">Terms & Conditions</a> and <a onclick="openLegal('modalPrivacy')">Privacy Policy</a>.</span></div><div class="footer-center"><div class="footer-nav"><a onclick="navigate('home')">Home</a><a onclick="navigate('projects')">Projects</a><a onclick="navigate('contact')">Contact</a></div></div><div class="footer-right"><div class="footer-socials"><a href="#" title="Instagram"><svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg></a><a href="#" title="LinkedIn"><svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a><a href="#" title="Twitter / X"><svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a><a href="#" title="YouTube"><svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a></div></div></footer>
+  </div>
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+
+  /* ══════════════════════════════════════
+     RAZORPAY + UPI CONFIG
+     Test Key: rzp_test_Scp61tqMOO1vWs
+     Replace with live key when going live
+  ══════════════════════════════════════ */
+  var RZP_KEY = 'rzp_test_Scp61tqMOO1vWs';
+  var UPI_ID  = 'qunixspace@upi'; /* Replace with your actual UPI ID */
+  var currentAmount = 0;
+
+  function selectPreset(btn, amount) {
+    document.querySelectorAll('.preset-btn').forEach(function(b) { b.classList.remove('selected'); });
+    btn.classList.add('selected');
+    if (amount === 0) {
+      document.getElementById('customWrap').style.display = 'flex';
+      document.getElementById('customAmtInput').focus();
+      currentAmount = parseInt(document.getElementById('customAmtInput').value) || 0;
+    } else {
+      document.getElementById('customWrap').style.display = 'none';
+      currentAmount = amount;
+      document.getElementById('customAmtInput').value = '';
+    }
+    updateAmountDisplay();
+  }
+
+  function updateAmountDisplay() {
+    var input = document.getElementById('customAmtInput').value;
+    if (input) currentAmount = parseInt(input) || 0;
+    document.getElementById('amtNum').textContent = currentAmount > 0 ? currentAmount.toLocaleString('en-IN') : '0';
+    updateRewardsUnlock();
+  }
+
+  function updateRewardsUnlock() {
+    var el = document.getElementById('rewardsUnlock');
+    var btn = document.getElementById('rzpBtn');
+    if (currentAmount <= 0) {
+      el.innerHTML = 'Select an amount to see your digital rewards.';
+      btn.disabled = false;
+      return;
+    }
+    if (currentAmount >= 5000) {
+      el.innerHTML = '<strong>Mission Pioneer rewards unlocked:</strong> Joiner letter · Backer certificate · Dev diary · Mission patch · Name in vehicle docs · Early footage access · Team Q&A';
+    } else if (currentAmount >= 1000) {
+      el.innerHTML = '<strong>Mission Friend rewards unlocked:</strong> Joiner letter · Backer certificate · Supporters list · Dev diary · Digital mission patch · Quarterly briefings';
+    } else {
+      el.innerHTML = '<strong>Supporter rewards unlocked:</strong> Official joiner letter · Digital backer certificate · Supporters wall listing · Mission progress updates';
+    }
+    btn.disabled = false;
+  }
+
+  function startRazorpay() {
+    if (currentAmount < 100) {
+      alert('Minimum contribution is ₹100.');
+      return;
+    }
+    /* Load Razorpay script dynamically */
+    if (typeof Razorpay === 'undefined') {
+      var script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.onload = function() { openRazorpay(); };
+      script.onerror = function() { alert('Could not load payment gateway. Please try again or use UPI.'); };
+      document.head.appendChild(script);
+    } else {
+      openRazorpay();
+    }
+  }
+
+  function openRazorpay() {
+    var options = {
+      key:         RZP_KEY,
+      amount:      currentAmount * 100, /* Razorpay expects paise */
+      currency:    'INR',
+      name:        'QUNIX',
+      description: 'Mission Contribution',
+      image:       '',
+      prefill: {
+        name:    '',
+        email:   '',
+        contact: ''
+      },
+      notes: {
+        purpose: 'QUNIX Crowdfunding'
+      },
+      theme: {
+        color: '#c0532a'
+      },
+      handler: function(response) {
+        /* Payment successful */
+        document.getElementById('payRef').textContent = 'REF: ' + response.razorpay_payment_id;
+        document.getElementById('paySuccessOverlay').classList.add('open');
+      },
+      modal: {
+        ondismiss: function() {
+          /* User closed the modal */
+        }
+      }
+    };
+    var rzp = new Razorpay(options);
+    rzp.on('payment.failed', function(response) {
+      alert('Payment failed: ' + response.error.description + '. Please try again.');
+    });
+    rzp.open();
+  }
+
+  function copyUPI() {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(UPI_ID).then(function() {
+        var btn = document.querySelector('.btn-copy-upi');
+        btn.textContent = 'Copied!';
+        setTimeout(function() { btn.textContent = 'Copy UPI ID'; }, 2000);
+      });
+    } else {
+      var el = document.createElement('textarea');
+      el.value = UPI_ID;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+      var btn = document.querySelector('.btn-copy-upi');
+      btn.textContent = 'Copied!';
+      setTimeout(function() { btn.textContent = 'Copy UPI ID'; }, 2000);
+    }
+  }
+
+  function generateQR() {
+    /* Build UPI deep link URL */
+    var upiLink = 'upi://pay?pa=' + encodeURIComponent(UPI_ID) + '&pn=QUNIX&cu=INR';
+    /* Use a free QR API — no external lib needed */
+    var qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=174x174&margin=0&data=' + encodeURIComponent(upiLink);
+    var qrImg = document.getElementById('qrImg');
+    if (qrImg) qrImg.src = qrUrl;
+    var upiDisplay = document.getElementById('upiIdDisplay');
+    if (upiDisplay) upiDisplay.textContent = UPI_ID;
+    /* Init custom amount wrap hidden */
+    var cw = document.getElementById('customWrap');
+    if (cw) cw.style.display = 'none';
+  }
+
+
+  /* ════════════════════════════════════════════════
+     GOOGLE SHEETS URL
+     Paste your Apps Script Web App URL here ↓
+  ════════════════════════════════════════════════ */
+  var SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzR8V3wFpF23CsHSFuzsjxhqa-5HMPviyC3TIpd5PE3LxZBaAD3KJ3klAqxgY2gk36WSA/exec';
+
+  /* ── CONTACT FORM SUBMISSION ── */
+  function submitContactForm() {
+    var name    = document.getElementById('contactName').value.trim();
+    var email   = document.getElementById('contactEmail').value.trim();
+    var message = document.getElementById('contactMessage').value.trim();
+    var btn     = document.getElementById('contactSubmit');
+    var status  = document.getElementById('formStatus');
+
+    /* Validation */
+    if (!name) {
+      showFormStatus('error', 'Please enter your name.');
+      document.getElementById('contactName').focus();
+      return;
+    }
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      showFormStatus('error', 'Please enter a valid email address.');
+      document.getElementById('contactEmail').focus();
+      return;
+    }
+    if (!message) {
+      showFormStatus('error', 'Please enter a message.');
+      document.getElementById('contactMessage').focus();
+      return;
+    }
+
+    /* Sending state */
+    btn.disabled = true;
+    btn.innerHTML = '<span style="display:inline-block;width:10px;height:10px;border:1.5px solid currentColor;border-top-color:transparent;border-radius:50%;animation:spin 0.7s linear infinite"></span> Sending…';
+    showFormStatus('', '');
+
+    /* Add spinner keyframes if not already present */
+    if (!document.getElementById('spinStyle')) {
+      var s = document.createElement('style');
+      s.id = 'spinStyle';
+      s.textContent = '@keyframes spin { to { transform: rotate(360deg); } }';
+      document.head.appendChild(s);
+    }
+
+    /* Send to Google Sheets via Apps Script Web App */
+    /* ── Use hidden iframe + form to avoid CORS issues with Apps Script ── */
+    var iframeName = 'hidden_iframe_' + Date.now();
+    var iframe = document.createElement('iframe');
+    iframe.name = iframeName;
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
+
+    var form = document.createElement('form');
+    form.method = 'POST';
+    form.action = SHEETS_URL;
+    form.target = iframeName;
+    form.style.display = 'none';
+
+    /* Apps Script reads req.parameter when form-encoded */
+    var fields = { name: name, email: email, message: message, page: 'contact' };
+    Object.keys(fields).forEach(function(key) {
+      var input = document.createElement('input');
+      input.type  = 'hidden';
+      input.name  = key;
+      input.value = fields[key];
+      form.appendChild(input);
+    });
+
+    document.body.appendChild(form);
+
+    /* Listen for iframe load = submission completed */
+    iframe.onload = function() {
+      showFormStatus('success', '✓ Message sent — we\'ll get back to you within 48 hours.');
+      document.getElementById('contactName').value    = '';
+      document.getElementById('contactEmail').value   = '';
+      document.getElementById('contactMessage').value = '';
+      btn.disabled    = false;
+      btn.textContent = 'Send Message';
+      /* Clean up */
+      setTimeout(function() {
+        document.body.removeChild(form);
+        document.body.removeChild(iframe);
+      }, 1000);
+    };
+
+    form.submit();
+  }
+
+  function showFormStatus(type, msg) {
+    var el = document.getElementById('formStatus');
+    el.textContent  = msg;
+    el.className    = 'form-status' + (type ? ' ' + type : '');
+  }
+
+  /* ── NAV ── */
   var menuOpen = false;
+  function isMobile() { return window.innerWidth <= 768; }
 
   function toggleMenu() {
     menuOpen = !menuOpen;
     document.getElementById('menuBtn').classList.toggle('open', menuOpen);
-    document.getElementById('navLinks').classList.toggle('open', menuOpen);
+    if (isMobile()) {
+      document.getElementById('mobilePanel').classList.toggle('open', menuOpen);
+      document.getElementById('mobileBackdrop').classList.toggle('open', menuOpen);
+    } else {
+      document.getElementById('navLinks').classList.toggle('open', menuOpen);
+    }
   }
 
-  function navigate(page) {
-    showPage(page);
+  function closeMobileMenu() {
     menuOpen = false;
     document.getElementById('menuBtn').classList.remove('open');
+    document.getElementById('mobilePanel').classList.remove('open');
+    document.getElementById('mobileBackdrop').classList.remove('open');
     document.getElementById('navLinks').classList.remove('open');
   }
 
-  function showPage(name) {
+  function navigate(page) { showPage(page); closeMobileMenu(); }
+
+  function showPage(name, skipHistory) {
     document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
     document.getElementById('page-' + name).classList.add('active');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo(0, 0);
+    document.querySelectorAll('.nav-links-inline a').forEach(function(a) {
+      a.classList.toggle('active-nav', a.getAttribute('data-page') === name);
+    });
+    if (name === 'home') {
+      var hb = document.getElementById('heroBlur');
+      if (hb) { hb.style.backdropFilter = 'blur(0px)'; hb.style.webkitBackdropFilter = 'blur(0px)'; hb.style.background = 'rgba(5,8,16,0)'; }
+    }
+    /* Push to browser history so back/forward buttons work */
+    if (!skipHistory) {
+      var url = name === 'home' ? window.location.pathname : window.location.pathname + '#' + name;
+      history.pushState({ page: name }, '', url);
+    }
+    /* Update document title */
+    var titles = { home: 'QUNIX', projects: 'QUNIX · Projects', about: 'QUNIX · About', contact: 'QUNIX · Contact', support: 'QUNIX · Support Us' };
+    document.title = titles[name] || 'QUNIX';
   }
+  /* Handle browser back/forward */
+  window.addEventListener('popstate', function(e) {
+    var page = (e.state && e.state.page) ? e.state.page : 'home';
+    showPage(page, true);
+  });
+  /* Load correct page on initial load from URL hash */
+  (function() {
+    var hash = window.location.hash.replace('#', '');
+    var validPages = ['home', 'projects', 'about', 'contact', 'support'];
+    if (hash && validPages.indexOf(hash) !== -1) {
+      showPage(hash, true);
+      history.replaceState({ page: hash }, '', window.location.pathname + '#' + hash);
+    } else {
+      history.replaceState({ page: 'home' }, '', window.location.pathname);
+    }
+  })();
+
+  /* Legacy privacy shortcut */
+  function openPrivacy() { openLegal('modalPrivacy'); }
+
+  function openLegal(id) { document.getElementById(id).classList.add('open'); }
+  function closeLegal(id) { document.getElementById(id).classList.remove('open'); }
+
+  document.querySelectorAll('.legal-modal-overlay').forEach(function(el) {
+    el.addEventListener('click', function(e) {
+      /* Only close when clicking the dark overlay itself, not the modal box */
+      if (e.target === el) { el.classList.remove('open'); }
+    });
+  });
+  /* Stop clicks inside the modal box from bubbling up to the overlay */
+  document.querySelectorAll('.legal-modal').forEach(function(box) {
+    box.addEventListener('click', function(e) { e.stopPropagation(); });
+  });
+  /* ESC key closes any open modal */
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.legal-modal-overlay.open').forEach(function(el) {
+        el.classList.remove('open');
+      });
+      var ps = document.getElementById('paySuccessOverlay');
+      if (ps) ps.classList.remove('open');
+    }
+  });
 
   document.addEventListener('DOMContentLoaded', function() {
-    /* Nav scroll blur */
-    var nav = document.querySelector('nav');
-    function onScroll() { nav.classList.toggle('scrolled', window.scrollY > 20); }
-    window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll();
-
-    /* Hero scroll blur — intensifies as prototype slides over */
+    var nav      = document.querySelector('nav');
     var heroBlur = document.getElementById('heroBlur');
     var hero     = document.getElementById('hero');
-    function onHeroScroll() {
-      if (!heroBlur || !hero) return;
-      var heroH   = hero.offsetHeight;
-      var scrollY = window.scrollY;
-      // progress 0→1 over one hero height
-      var progress = Math.min(Math.max(scrollY / heroH, 0), 1);
-      var blur = progress * 18;          // max 18px blur
-      var dim  = progress * 0.55;        // max 55% dark overlay
-      heroBlur.style.backdropFilter         = 'blur(' + blur + 'px)';
-      heroBlur.style.webkitBackdropFilter   = 'blur(' + blur + 'px)';
-      heroBlur.style.background             = 'rgba(5,8,16,' + dim + ')';
-    }
-    window.addEventListener('scroll', onHeroScroll, { passive: true });
-    onHeroScroll();
 
-    /* Close menu on outside click */
-    document.addEventListener('click', function(e) {
-      if (!menuOpen) return;
-      if (!nav.contains(e.target)) {
-        menuOpen = false;
-        document.getElementById('menuBtn').classList.remove('open');
-        document.getElementById('navLinks').classList.remove('open');
-      }
+    generateQR();
+    function onScroll() { nav.classList.toggle('scrolled', window.scrollY > 20); }
+
+    function applyHeroBlur() {
+      if (!heroBlur || !hero) return;
+      var heroH    = hero.offsetHeight;
+      var start    = heroH * 0.30;
+      var end      = heroH * 0.75;
+      var progress = Math.min(Math.max((window.scrollY - start) / (end - start), 0), 1);
+      heroBlur.style.backdropFilter       = 'blur(' + (progress * 18) + 'px)';
+      heroBlur.style.webkitBackdropFilter = 'blur(' + (progress * 18) + 'px)';
+      heroBlur.style.background           = 'rgba(5,8,16,' + (progress * 0.55) + ')';
+    }
+
+    window.addEventListener('scroll', function() { onScroll(); applyHeroBlur(); }, { passive: true });
+    onScroll();
+
+    requestAnimationFrame(function() {
+      requestAnimationFrame(function() { applyHeroBlur(); });
     });
 
-    /* Hide rocket placeholder when image loads */
-    var rocketImg = document.querySelector('.rocket-wrap img');
-    if (rocketImg) {
-      rocketImg.addEventListener('load', function() {
-        var p = document.getElementById('rocketPlaceholder');
-        if (p) p.style.display = 'none';
-      });
-    }
+    document.addEventListener('click', function(e) {
+      if (!menuOpen) return;
+      var panel = document.getElementById('mobilePanel');
+      if (!nav.contains(e.target) && !panel.contains(e.target)) closeMobileMenu();
+    });
   });
 </script>
 </body>
